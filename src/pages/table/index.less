@@ -1,0 +1,26 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  .tips {
+    .title {
+      font-size: 24px;
+    }
+  }
+  .dateRange {
+    display: flex;
+    justify-content: flex-end;
+    flex-direction: column;
+    .labelDesc {
+      padding: 15px;
+    }
+    :global(.ant-calendar-picker) {
+      width: 220px;
+    }
+    .search {
+      display: flex;
+      justify-content: flex-end;
+      margin: 10px 0;
+    }
+  }
+}
