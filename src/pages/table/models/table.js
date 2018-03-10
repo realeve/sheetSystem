@@ -12,6 +12,7 @@ export default {
     dataSource: [],
     dataSrc: [],
     dataClone: [],
+    dataSearchClone: [],
     columns: [],
     total: null,
     page: 1,
@@ -20,8 +21,8 @@ export default {
     sortedInfo: {}
   },
   reducers: {
-    save(state, { payload: { dataSrc, dataSource, total } }) {
-      return { ...state, dataSrc, dataSource, total };
+    save(state, { payload: { dataSrc, dataSource, total, dataSearchClone } }) {
+      return { ...state, dataSrc, dataSource, total, dataSearchClone };
     },
     setPage(state, { payload: page }) {
       return {
@@ -61,9 +62,60 @@ export default {
         sortedInfo,
         dataClone
       };
+    },
+    setDataClone(state, { payload: { dataClone, total } }) {
+      return {
+        ...state,
+        dataClone,
+        total
+      };
+    },
+    setDataSearchClone(state, { payload: { dataSearchClone, total } }) {
+      return {
+        ...state,
+        dataSearchClone,
+        total
+      };
     }
   },
   effects: {
+    *searchData({ payload: keyword }, { call, put, select }) {
+      keyword = keyword.trim();
+      const store = yield select(state => state.table);
+      const { dataSearchClone, dataClone } = store;
+      if (keyword === "") {
+        // 如果有数据，还原dataClone;
+        if (dataSearchClone.length) {
+          yield put({
+            type: "setDataClone",
+            payload: {
+              dataClone: dataSearchClone,
+              total: dataSearchClone.length
+            }
+          });
+        }
+        return;
+      }
+
+      // 先将数据备份存储
+      if (dataSearchClone.length === 0) {
+        yield put({
+          type: "setDataSearchClone",
+          payload: { dataSearchClone: dataClone, total: dataClone.length }
+        });
+      }
+
+      const data = dataSearchClone.filter(
+        tr => Object.values(tr).filter(td => ("" + td).includes(keyword)).length
+      );
+
+      if (dataSearchClone.length) {
+        yield put({
+          type: "setDataClone",
+          payload: { dataClone: data, total: data.length }
+        });
+      }
+    },
     *customSorter({ payload: sortedInfo }, { call, put, select }) {
       const { field, order } = sortedInfo;
       if (typeof field === "undefined") {
@@ -159,7 +211,8 @@ export default {
         payload: {
           dataSrc: data,
           dataSource,
-          total: data.rows
+          total: data.rows,
+          dataSearchClone: []
         }
       });
     }

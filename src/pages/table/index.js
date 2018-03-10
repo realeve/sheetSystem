@@ -4,6 +4,7 @@ import Table from "./components/Table";
 import { DatePicker, Button, Input } from "antd";
 import * as db from "./services/table";
 import styles from "./index.less";
+
 import dateRanges from "../../utils/ranges";
 import moment from "moment";
 import "moment/locale/zh-cn";
@@ -34,13 +35,18 @@ function Tables({ dispatch, tid, dateRange, title }) {
     return "";
   };
 
-  const searchData = value => {
-    console.log(value);
-  };
-
-  const searchUp = e => {
+  let handleSearchChange = async e => {
     const value = e.target.value;
-    console.log(value);
+
+    await dispatch({
+      type: "table/searchData",
+      payload: value
+    });
+
+    dispatch({
+      type: "table/changePage",
+      payload: 1
+    });
   };
 
   return (
@@ -69,8 +75,7 @@ function Tables({ dispatch, tid, dateRange, title }) {
           <div className={styles.search}>
             <Search
               placeholder="输入任意值过滤数据"
-              onSearch={searchData}
-              onKeyUp={searchUp}
+              onChange={handleSearchChange}
               style={{ width: 220 }}
             />
           </div>
