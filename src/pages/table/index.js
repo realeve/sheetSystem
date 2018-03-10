@@ -67,9 +67,7 @@ function Tables({ dispatch, tid, dateRange, title, columns, data }) {
   const downloadExcel = () => {
     const config = getExportConfig();
     config.filename = config.filename + ".xlsx";
-    const xlsx = new Excel({
-      config
-    });
+    const xlsx = new Excel(config);
     xlsx.save();
   };
 

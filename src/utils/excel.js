@@ -61,6 +61,7 @@ export default class Excel {
     if (data.header) {
       xml += this.addRow(data.header);
     }
+
     data.body.forEach(item => {
       xml += this.addRow(item);
     });
