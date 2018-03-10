@@ -32,7 +32,7 @@ function Tables({
     reloadData(newPage);
   };
 
-  const reloadData = newPage => {
+  const reloadData = (newPage = 1) => {
     dispatch({
       type: "table/changePage",
       payload: newPage

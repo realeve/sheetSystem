@@ -133,7 +133,6 @@ export default {
     *customFilter({ payload: filters }, { call, put, select }) {
       const store = yield select(state => state.table);
       const { dataSrc, columns } = store;
-
       let dataClone = yield call(db.handleFilter, {
         data: dataSrc.data,
         filters

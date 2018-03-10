@@ -76,16 +76,15 @@ export function handleColumns({ dataSrc, sortedInfo, filteredInfo }) {
 }
 
 export function handleFilter({ data, filters }) {
-  // 复制拷贝
-  let newData = R.clone(data);
-  // 获取过滤器键值
-  const keys = R.keys(filters);
-  R.forEach(key => {
-    if (!filters[key] === null && filters[key].length === 0) {
-      newData = R.filter(item => filters[key].includes(item[key]))(newData);
-    }
-  })(keys);
-  return newData;
+  R.compose(
+    R.forEach(key => {
+      if (filters[key] !== null && filters[key].length !== 0) {
+        data = R.filter(item => filters[key].includes(item[key]))(data);
+      }
+    }),
+    R.keys
+  )(filters);
+  return data;
 }
 
 export function updateColumns({ columns, filters }) {
