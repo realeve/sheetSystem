@@ -106,7 +106,10 @@ export default {
       }
 
       const data = dataSearchClone.filter(
-        tr => Object.values(tr).filter(td => ("" + td).includes(keyword)).length
+        tr =>
+          Object.values(tr)
+            .slice(1)
+            .filter(td => ("" + td).includes(keyword)).length
       );
 
       if (dataSearchClone.length) {
