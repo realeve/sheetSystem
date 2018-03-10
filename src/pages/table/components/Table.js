@@ -70,12 +70,14 @@ function Tables({
         pagination={false}
         size="medium"
         onChange={handleChange}
-        footer={() => `${dataSrc.source} (共耗时${dataSrc.timing})` || ""}
+        footer={() =>
+          dataSrc.source ? `${dataSrc.source} (共耗时${dataSrc.timing})` : ""
+        }
       />
       <Pagination
         className="ant-table-pagination"
         showTotal={(total, range) =>
-          `${range[0]}-${range[1]} 共 ${total} 条数据`
+          total ? `${range[0]}-${range[1]} 共 ${total} 条数据` : ""
         }
         showSizeChanger
         onShowSizeChange={onShowSizeChange}

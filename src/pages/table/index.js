@@ -4,6 +4,8 @@ import Table from "./components/Table";
 import { DatePicker, Button, Input } from "antd";
 import * as db from "./services/table";
 import styles from "./index.less";
+import Excel from "../../utils/excel";
+import pdf from "../../utils/pdf";
 
 import dateRanges from "../../utils/ranges";
 import moment from "moment";
@@ -13,7 +15,9 @@ moment.locale("zh-cn");
 const Search = Input.Search;
 const RangePicker = DatePicker.RangePicker;
 
-function Tables({ dispatch, tid, dateRange, title }) {
+const R = require("ramda");
+
+function Tables({ dispatch, tid, dateRange, title, columns, data }) {
   const onDateChange = (dates, dateStrings) => {
     const [tstart, tend] = dateStrings;
     dispatch(db.getQueryConfig({ tid, tstart, tend }));
@@ -49,12 +53,45 @@ function Tables({ dispatch, tid, dateRange, title }) {
     });
   };
 
+  const getExportConfig = () => {
+    const header = R.map(R.prop("title"))(columns);
+    const filename = `${title}(${dateRange.join("至")})`;
+    const keys = header.map((item, i) => "col" + i);
+    const body = R.map(R.props(keys))(data);
+    return {
+      filename,
+      header,
+      body
+    };
+  };
+  const downloadExcel = () => {
+    const config = getExportConfig();
+    config.filename = config.filename + ".xlsx";
+    const xlsx = new Excel({
+      config
+    });
+    xlsx.save();
+  };
+
+  const downloadPdf = () => {
+    const config = getExportConfig();
+    config.download = "open";
+    config.title = title;
+    pdf(config);
+  };
+
   return (
     <>
       <div className={styles.header}>
-        <div className={styles.action}>
-          <Button icon="file-excel">下载excel</Button>
-          <Button icon="file-pdf" style={{ marginLeft: 10 }}>
+        <div>
+          <Button icon="file-excel" onClick={downloadExcel}>
+            下载excel
+          </Button>
+          <Button
+            icon="file-pdf"
+            onClick={downloadPdf}
+            style={{ marginLeft: 10 }}
+          >
             下载pdf
           </Button>
         </div>
@@ -89,7 +126,9 @@ function Tables({ dispatch, tid, dateRange, title }) {
 function mapStateToProps(state) {
   return {
     ...state.tableConf,
-    title: state.table.dataSrc.title || ""
+    title: state.table.dataSrc.title || "",
+    columns: state.table.columns,
+    data: state.table.dataClone
   };
 }
 

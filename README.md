@@ -1,4 +1,14 @@
-# umi-dva-user-dashboard
+# 报表系统
 
-详见[《umi + dva，完成用户管理的 CURD 应用》](https://github.com/sorrycc/blog/issues/62)
+基于 umi+dva+antd+react
 
+## 服务端：https://github.com/realeve/thinkPHP
+
+## 路由
+
+此处 :tid 表示接口 id，数据格式有微调
+http://localhost:8000/table/:tid
+
+http://localhost:8000/table/:tid?cache=10
+
+http://localhost:8000/table/:tid?cache=10&其它参数
