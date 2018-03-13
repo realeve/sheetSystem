@@ -30,17 +30,13 @@ function Tables({ dispatch, tid, dateRange, title, columns, data, loading }) {
     });
   };
 
-  const tableTitle = () => {
-    if (title) {
-      return (
-        <div className={styles.tips}>
-          <div className={styles.title}>{title}</div>
-          <small>时间范围 : {dateRange.join("至")}</small>
-        </div>
-      );
-    }
-    return "";
-  };
+  const TableTitle = () =>
+    title && (
+      <div className={styles.tips}>
+        <div className={styles.title}>{title}</div>
+        <small>时间范围 : {dateRange.join("至")}</small>
+      </div>
+    );
 
   let handleSearchChange = async e => {
     const value = e.target.value;
@@ -49,7 +45,6 @@ function Tables({ dispatch, tid, dateRange, title, columns, data, loading }) {
       type: "table/searchData",
       payload: value
     });
-
     dispatch({
       type: "table/changePage",
       payload: 1
@@ -81,40 +76,6 @@ function Tables({ dispatch, tid, dateRange, title, columns, data, loading }) {
     pdf(config);
   };
 
-  const Header = () => {
-    return (
-      <div className={styles.header}>
-        <Action />
-        {tableTitle()}
-        <SearchBar />
-      </div>
-    );
-  };
-
-  const SearchBar = () => (
-    <div className={styles.dateRange}>
-      <div>
-        <label className={styles.labelDesc}>起始时间:</label>
-        <RangePicker
-          ranges={dateRanges}
-          format="YYYYMMDD"
-          onChange={onDateChange}
-          defaultValue={[moment(dateRange[0]), moment(dateRange[1])]}
-          locale={{
-            rangePlaceholder: ["开始日期", "结束日期"]
-          }}
-        />
-      </div>
-      <div className={styles.search}>
-        <Search
-          placeholder="输入任意值过滤数据"
-          onChange={handleSearchChange}
-          style={{ width: 220 }}
-        />
-      </div>
-    </div>
-  );
-
   const Action = () => {
     const menu = (
       <Menu>
@@ -141,9 +102,39 @@ function Tables({ dispatch, tid, dateRange, title, columns, data, loading }) {
     );
   };
 
+  const DateRangePicker = () => (
+    <div>
+      {/* <label className={styles.labelDesc}>起始时间:</label> */}
+      <RangePicker
+        ranges={dateRanges}
+        format="YYYYMMDD"
+        onChange={onDateChange}
+        defaultValue={[moment(dateRange[0]), moment(dateRange[1])]}
+        locale={{
+          rangePlaceholder: ["开始日期", "结束日期"]
+        }}
+      />
+    </div>
+  );
+
   return (
     <Card
-      title={<Header />}
+      title={
+        <div className={styles.header}>
+          <Action />
+          <TableTitle />
+          <div className={styles.dateRange}>
+            <DateRangePicker />
+            <div className={styles.search}>
+              <Search
+                placeholder="输入任意值过滤数据"
+                onChange={handleSearchChange}
+                style={{ width: 220 }}
+              />
+            </div>
+          </div>
+        </div>
+      }
       // loading={loading}
       style={{ width: "100%" }}
       bodyStyle={{ padding: "0px 0px 12px 0px" }}

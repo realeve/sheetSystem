@@ -16,7 +16,7 @@ export default {
     columns: [],
     total: null,
     page: 1,
-    pageSize: 15,
+    pageSize: 10,
     filteredInfo: {},
     sortedInfo: {}
   },
@@ -63,35 +63,32 @@ export default {
         dataClone
       };
     },
-    setDataClone(state, { payload: { dataClone, total } }) {
+    setDataClone(state, { payload: dataClone }) {
       return {
         ...state,
         dataClone,
-        total
+        total: dataClone.length
       };
     },
-    setDataSearchClone(state, { payload: { dataSearchClone, total } }) {
+    setDataSearchClone(state, { payload: dataSearchClone }) {
       return {
         ...state,
         dataSearchClone,
-        total
+        total: dataSearchClone.length
       };
     }
   },
   effects: {
-    *searchData({ payload: keyword }, { call, put, select }) {
-      keyword = keyword.trim();
+    *searchData({ payload: keyword }, { put, select }) {
+      let key = keyword.trim();
       const store = yield select(state => state.table);
       const { dataSearchClone, dataClone } = store;
-      if (keyword === "") {
+      if (key === "") {
         // 如果有数据，还原dataClone;
         if (dataSearchClone.length) {
           yield put({
             type: "setDataClone",
-            payload: {
-              dataClone: dataSearchClone,
-              total: dataSearchClone.length
-            }
+            payload: dataSearchClone
           });
         }
         return;
@@ -101,21 +98,17 @@ export default {
       if (dataSearchClone.length === 0) {
         yield put({
           type: "setDataSearchClone",
-          payload: { dataSearchClone: dataClone, total: dataClone.length }
+          payload: dataClone
         });
-      }
-
-      const data = dataSearchClone.filter(
-        tr =>
-          Object.values(tr)
-            .slice(1)
-            .filter(td => ("" + td).includes(keyword)).length
-      );
-
-      if (dataSearchClone.length) {
+      } else {
         yield put({
           type: "setDataClone",
-          payload: { dataClone: data, total: data.length }
+          payload: dataSearchClone.filter(
+            tr =>
+              Object.values(tr)
+                .slice(1)
+                .filter(td => ("" + td).includes(key)).length
+          )
         });
       }
     },
@@ -175,7 +168,7 @@ export default {
         payload: page
       });
     },
-    *readGoodRate({ payload: { url, params } }, { call, put, select }) {
+    *fetchAPIData({ payload: { url, params } }, { call, put, select }) {
       let data = yield call(db.fetchData, { url, params });
       const store = yield select(state => state.table);
       const { pageSize, page, filteredInfo, sortedInfo } = store;

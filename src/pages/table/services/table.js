@@ -110,8 +110,8 @@ export function handleSort({ dataClone, field, order }) {
 export const getPageData = ({ data, page, pageSize }) =>
   data.slice((page - 1) * pageSize, page * pageSize);
 
-export const getQueryConfig = ({ tid, tstart, tend }) => ({
-  type: "table/readGoodRate",
+export const getQueryConfig = ({ tid, tstart, tend, idx }) => ({
+  type: "table/fetchAPIData",
   payload: {
     url: lib.apiHost,
     params: {
@@ -123,6 +123,16 @@ export const getQueryConfig = ({ tid, tstart, tend }) => ({
       tend2: tend,
       tstart3: tstart,
       tend3: tend
-    }
+    },
+    idx
   }
 });
+
+export const handleState = ({ keyStr, state, payload }) => {
+  const { idx } = payload;
+  keyStr.split(",").forEach(key => {
+    key = key.trim();
+    state[key][idx] = payload[key];
+  });
+  return state;
+};
