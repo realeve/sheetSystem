@@ -21,9 +21,6 @@ function Tables({ dispatch, tid, dateRange, title, columns, data, loading }) {
   const onDateChange = async (dates, dateStrings) => {
     const [tstart, tend] = dateStrings;
     await dispatch(db.getQueryConfig({ tid, tstart, tend }));
-    await dispatch({
-      type: "tasks/handleTaskData"
-    });
     dispatch({
       type: "tableConf/setDateRange",
       payload: dateStrings

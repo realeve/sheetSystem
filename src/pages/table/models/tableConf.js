@@ -53,7 +53,7 @@ export default {
 
           dispatch({
             type: "updateTid",
-            payload: tid.split(",")[0]
+            payload: tid
           });
 
           const config = db.getQueryConfig({
