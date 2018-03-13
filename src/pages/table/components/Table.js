@@ -1,7 +1,6 @@
 import React from "react";
 import { connect } from "dva";
 import { Table, Pagination } from "antd";
-import styles from "./Table.less";
 
 function Tables({
   dispatch,
@@ -61,7 +60,7 @@ function Tables({
   };
 
   return (
-    <div className={styles.tableWrapper}>
+    <>
       <Table
         loading={loading}
         columns={columns}
@@ -87,13 +86,13 @@ function Tables({
         onChange={pageChangeHandler}
         pageSizeOptions={["5", "10", "15", "20", "30", "40", "50", "100"]}
       />
-    </div>
+    </>
   );
 }
 
 function mapStateToProps(state) {
   return {
-    loading: state.loading.models.users,
+    loading: state.loading.models.table,
     ...state.table
   };
 }

@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from "dva";
 import Table from "./components/Table";
-import { DatePicker, Button, Input } from "antd";
+import { DatePicker, Button, Input, Card, Menu, Dropdown, Icon } from "antd";
 import * as db from "./services/table";
 import styles from "./index.less";
 import Excel from "../../utils/excel";
@@ -17,10 +17,13 @@ const RangePicker = DatePicker.RangePicker;
 
 const R = require("ramda");
 
-function Tables({ dispatch, tid, dateRange, title, columns, data }) {
-  const onDateChange = (dates, dateStrings) => {
+function Tables({ dispatch, tid, dateRange, title, columns, data, loading }) {
+  const onDateChange = async (dates, dateStrings) => {
     const [tstart, tend] = dateStrings;
-    dispatch(db.getQueryConfig({ tid, tstart, tend }));
+    await dispatch(db.getQueryConfig({ tid, tstart, tend }));
+    await dispatch({
+      type: "tasks/handleTaskData"
+    });
     dispatch({
       type: "tableConf/setDateRange",
       payload: dateStrings
@@ -78,25 +81,12 @@ function Tables({ dispatch, tid, dateRange, title, columns, data }) {
     pdf(config);
   };
 
-  return (
-    <>
+  const Header = () => {
+    return (
       <div className={styles.header}>
-        <div>
-          <Button icon="file-excel" onClick={downloadExcel}>
-            下载excel
-          </Button>
-          <Button
-            icon="file-pdf"
-            onClick={downloadPdf}
-            style={{ marginLeft: 10 }}
-          >
-            下载pdf
-          </Button>
-        </div>
-        {tableTitle()}
         <div className={styles.dateRange}>
           <div>
-            <label className={styles.labelDesc}>起始时间:</label>
+            {/* <label className={styles.labelDesc}>起始时间:</label> */}
             <RangePicker
               ranges={dateRanges}
               format="YYYYMMDD"
@@ -115,15 +105,55 @@ function Tables({ dispatch, tid, dateRange, title, columns, data }) {
             />
           </div>
         </div>
+        {tableTitle()}
       </div>
+    );
+  };
+
+  const Action = () => {
+    const menu = (
+      <Menu>
+        <Menu.Item>
+          <a rel="noopener noreferrer" onClick={downloadExcel}>
+            <Icon type="file-excel" />
+            excel
+          </a>
+        </Menu.Item>
+        <Menu.Item>
+          <a rel="noopener noreferrer" onClick={downloadPdf}>
+            <Icon type="file-pdf" />
+            PDF
+          </a>
+        </Menu.Item>
+      </Menu>
+    );
+    return (
+      <Dropdown overlay={menu}>
+        <Button style={{ marginLeft: 0 }}>
+          下载 <Icon type="down" />
+        </Button>
+      </Dropdown>
+    );
+  };
+
+  return (
+    <Card
+      title={<Header />}
+      // loading={loading}
+      style={{ width: "100%" }}
+      bodyStyle={{ padding: "0px 0px 12px 0px" }}
+      extra={<Action />}
+      className={styles.exCard}
+    >
       <Table />
-    </>
+    </Card>
   );
 }
 
 function mapStateToProps(state) {
   return {
     ...state.tableConf,
+    // loading: state.loading.models.table,
     title: state.table.dataSrc.title || "",
     columns: state.table.columns,
     data: state.table.dataClone
