@@ -84,31 +84,36 @@ function Tables({ dispatch, tid, dateRange, title, columns, data, loading }) {
   const Header = () => {
     return (
       <div className={styles.header}>
-        <div className={styles.dateRange}>
-          <div>
-            {/* <label className={styles.labelDesc}>起始时间:</label> */}
-            <RangePicker
-              ranges={dateRanges}
-              format="YYYYMMDD"
-              onChange={onDateChange}
-              defaultValue={[moment(dateRange[0]), moment(dateRange[1])]}
-              locale={{
-                rangePlaceholder: ["开始日期", "结束日期"]
-              }}
-            />
-          </div>
-          <div className={styles.search}>
-            <Search
-              placeholder="输入任意值过滤数据"
-              onChange={handleSearchChange}
-              style={{ width: 220 }}
-            />
-          </div>
-        </div>
+        <Action />
         {tableTitle()}
+        <SearchBar />
       </div>
     );
   };
+
+  const SearchBar = () => (
+    <div className={styles.dateRange}>
+      <div>
+        <label className={styles.labelDesc}>起始时间:</label>
+        <RangePicker
+          ranges={dateRanges}
+          format="YYYYMMDD"
+          onChange={onDateChange}
+          defaultValue={[moment(dateRange[0]), moment(dateRange[1])]}
+          locale={{
+            rangePlaceholder: ["开始日期", "结束日期"]
+          }}
+        />
+      </div>
+      <div className={styles.search}>
+        <Search
+          placeholder="输入任意值过滤数据"
+          onChange={handleSearchChange}
+          style={{ width: 220 }}
+        />
+      </div>
+    </div>
+  );
 
   const Action = () => {
     const menu = (
@@ -142,7 +147,7 @@ function Tables({ dispatch, tid, dateRange, title, columns, data, loading }) {
       // loading={loading}
       style={{ width: "100%" }}
       bodyStyle={{ padding: "0px 0px 12px 0px" }}
-      extra={<Action />}
+      // extra={<Action />}
       className={styles.exCard}
     >
       <Table />
