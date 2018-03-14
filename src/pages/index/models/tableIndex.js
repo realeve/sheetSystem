@@ -6,14 +6,12 @@ const namespace = "tableIndex";
 export default {
   namespace,
   state: {
-    dataSrc: [],
     dateRange: [],
-    tid: []
+    tid: [],
+    config: {},
+    query: {}
   },
   reducers: {
-    fetchData(state, { payload: dataSrc }) {
-      return { ...state, dataSrc };
-    },
     setTid(state, { payload: tid }) {
       return {
         ...state,
@@ -25,16 +23,21 @@ export default {
         ...state,
         dateRange
       };
+    },
+    setConfig(state, { payload: config }) {
+      return {
+        ...state,
+        config
+      };
+    },
+    setQuery(state, { payload: query }) {
+      return {
+        ...state,
+        query
+      };
     }
   },
   effects: {
-    *fetchAPIData({ payload: { url, params } }, { call, put, select }) {
-      let dataSrc = yield call(db.fetchData, { url, params });
-      yield put({
-        type: "fetchData",
-        payload: dataSrc
-      });
-    },
     *updateDateRange({ payload: dateRange }, { put }) {
       yield put({
         type: "setDateRange",
@@ -45,6 +48,28 @@ export default {
       yield put({
         type: "setTid",
         payload: tid
+      });
+    },
+    *updateQuery({ payload: query }, { put }) {
+      yield put({
+        type: "setQuery",
+        payload: query
+      });
+    },
+    *updateConfig({ payload: { tstart, tend } }, { put, call, select }) {
+      const { tid, query } = yield select(state => state.tableIndex);
+      const config = tid.map(
+        item =>
+          db.getQueryConfig({
+            ...query,
+            tid: item,
+            tstart,
+            tend
+          }).payload
+      );
+      yield put({
+        type: "setConfig",
+        payload: config
       });
     }
   },
@@ -60,20 +85,25 @@ export default {
             payload: [ts, te]
           });
 
-          const tid = match[1];
+          const tid = match[1].split(",");
 
           dispatch({
             type: "updateTid",
             payload: tid
           });
 
-          const config = db.getQueryConfig({
-            ...query,
-            tid,
-            tstart: ts,
-            tend: te
+          dispatch({
+            type: "updateQuery",
+            payload: query
           });
-          dispatch(config);
+
+          dispatch({
+            type: "updateConfig",
+            payload: {
+              tstart: ts,
+              tend: te
+            }
+          });
         }
       });
     }

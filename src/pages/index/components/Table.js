@@ -22,9 +22,8 @@ const Search = Input.Search;
 class Tables extends Component {
   constructor(props) {
     super(props);
-
-    this.dataSrc = props.dataSrc;
-    this.loading = props.loading;
+    this.config = props.config;
+    this.dataSrc = [];
     this.dataClone = [];
     this.dataSearchClone = [];
 
@@ -41,8 +40,9 @@ class Tables extends Component {
     };
   }
 
-  init() {
-    console.log("初始化");
+  init = async () => {
+    this.dataSrc = await db.fetchData(this.config);
+
     const { page, pageSize } = this.state;
     let data = this.dataSrc;
     const { source, timing } = data;
@@ -56,7 +56,6 @@ class Tables extends Component {
     let dataSource = [];
 
     if (data.rows) {
-      console.log(data);
       if (typeof data.data[0].key === "undefined") {
         data.data = data.data.map((item, key) => {
           let col = { key };
@@ -79,16 +78,17 @@ class Tables extends Component {
       dataSource
     });
     this.dataSearchClone = [];
-  }
+  };
 
   componentDidMount() {
     this.init();
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log(nextProps.dataSrc);
-    this.dataSrc = nextProps.dataSrc;
-    this.loading = nextProps.loading;
+    if (R.equals(nextProps.config, this.config)) {
+      return;
+    }
+    this.config = nextProps.config;
     this.init();
   }
 
@@ -159,10 +159,11 @@ class Tables extends Component {
 
     if (key === "") {
       // 如果有数据，还原dataClone;
+      // console.log(dataSearchClone);
+
       if (dataSearchClone.length) {
         this.dataClone = dataSearchClone;
       }
-      return;
     } else {
       // 先将数据备份存储
       if (dataSearchClone.length === 0) {
@@ -176,17 +177,16 @@ class Tables extends Component {
         );
       }
     }
-
     this.refreshByPage();
   };
 
   getExportConfig = () => {
     const { columns } = this.state;
     const { title } = this.dataSrc;
-    const { dateRange } = this.props;
+    const dateRange = this.config.params;
 
     const header = R.map(R.prop("title"))(columns);
-    const filename = `${title}(${dateRange.join("至")})`;
+    const filename = `${title}(${dateRange.tstart} 至 ${dateRange.tend})`;
     const keys = header.map((item, i) => "col" + i);
     const body = R.map(R.props(keys))(this.dataClone);
     return {
@@ -237,14 +237,16 @@ class Tables extends Component {
   };
 
   TableTitle = () => {
-    const { dateRange } = this.props;
+    const dateRange = this.config.params;
     const { title } = this.dataSrc;
     return (
       title && (
         <div className={styles.tips}>
           <div className={styles.title}>{title}</div>
-          {dateRange.length > 0 && (
-            <small>时间范围 : {dateRange.join("至")}</small>
+          {dateRange.tstart && (
+            <small>
+              时间范围 : {dateRange.tstart} 至 {dateRange.tend}
+            </small>
           )}
         </div>
       )
@@ -304,7 +306,7 @@ class Tables extends Component {
               <Search
                 placeholder="输入任意值过滤数据"
                 onChange={this.handleSearchChange}
-                style={{ width: 220 }}
+                style={{ width: 220, height: 35 }}
               />
             </div>
           </div>
@@ -320,18 +322,15 @@ class Tables extends Component {
 }
 
 Tables.defaultProps = {
-  dataSrc: {
-    cache: 10,
-    timing: "0ms",
-    rows: 0,
-    cols: 0,
-    header: [],
-    data: [],
-    title: "",
-    source: ""
-  },
-  loading: false,
-  dateRange: []
+  config: {
+    url: "",
+    params: {
+      ID: "258",
+      cache: 10,
+      tstart: "",
+      tend: ""
+    }
+  }
 };
 
 export default Tables;

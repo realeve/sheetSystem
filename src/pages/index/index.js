@@ -2,9 +2,7 @@ import React from "react";
 import { connect } from "dva";
 import Table from "./components/Table";
 import { DatePicker } from "antd";
-import * as db from "./services/table";
 import styles from "./index.less";
-
 import dateRanges from "../../utils/ranges";
 import moment from "moment";
 import "moment/locale/zh-cn";
@@ -12,15 +10,17 @@ moment.locale("zh-cn");
 
 const RangePicker = DatePicker.RangePicker;
 
-function Tables({ dispatch, tid, dateRange, dataSrc, loading }) {
+function Tables({ dispatch, dateRange, config, loading }) {
   const onDateChange = async (dates, dateStrings) => {
     const [tstart, tend] = dateStrings;
-    let config = db.getQueryConfig({ tid, tstart, tend });
-    config.type = "tableIndex/fetchAPIData";
-    await dispatch(config);
-    dispatch({
+    await dispatch({
       type: "tableIndex/setDateRange",
       payload: dateStrings
+    });
+
+    await dispatch({
+      type: "tableIndex/updateConfig",
+      payload: { tstart, tend }
     });
   };
 
@@ -45,11 +45,17 @@ function Tables({ dispatch, tid, dateRange, dataSrc, loading }) {
           <DateRangePicker />
         </div>
       </div>
-      <Table dataSrc={dataSrc} dateRange={dateRange} />
+      {config.map((item, id) => (
+        <div
+          className={id > 0 ? styles.tableContainer : ""}
+          key={item.params.ID}
+        >
+          <Table config={item} />
+        </div>
+      ))}
     </>
   );
 }
-// loading={loading}
 
 function mapStateToProps(state) {
   return {
