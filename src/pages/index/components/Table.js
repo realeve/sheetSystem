@@ -36,12 +36,26 @@ class Tables extends Component {
       source: "",
       timing: "",
       filteredInfo: {},
-      sortedInfo: {}
+      sortedInfo: {},
+      loading: false
     };
   }
 
   init = async () => {
+    let start = new Date();
+
+    this.setState({ loading: true });
     this.dataSrc = await db.fetchData(this.config);
+    this.setState({ loading: false });
+
+    let end = new Date();
+    console.log(
+      "表格",
+      this.config.params.ID,
+      "加载完成，总耗时：",
+      end.getTime() - start.getTime(),
+      "ms"
+    );
 
     const { page, pageSize } = this.state;
     let data = this.dataSrc;
