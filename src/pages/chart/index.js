@@ -14,12 +14,12 @@ function Charts({ dispatch, dateRange, config, loading }) {
   const onDateChange = async (dates, dateStrings) => {
     const [tstart, tend] = dateStrings;
     await dispatch({
-      type: "tableIndex/setDateRange",
+      type: "chartIndex/setDateRange",
       payload: dateStrings
     });
 
     await dispatch({
-      type: "tableIndex/updateConfig",
+      type: "chartIndex/updateConfig",
       payload: { tstart, tend }
     });
   };

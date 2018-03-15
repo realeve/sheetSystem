@@ -14,11 +14,14 @@ class Charts extends Component {
   constructor(props) {
     super(props);
     this.config = props.config;
-    this.dataSrc = [];
+    this.dataSrc = {};
 
     this.state = {
-      loading: false
+      loading: false,
+      option: {}
     };
+
+    this.echarts = null;
   }
 
   init = async () => {
@@ -26,9 +29,10 @@ class Charts extends Component {
 
     this.setState({ loading: true });
     this.dataSrc = await db.fetchData(this.config);
-    this.setState({ loading: false });
-
+    const option = this.getOption();
+    this.setState({ loading: false, option });
     let end = new Date();
+
     console.log(
       "表格",
       this.config.params.ID,
@@ -36,6 +40,7 @@ class Charts extends Component {
       end.getTime() - start.getTime(),
       "ms"
     );
+    this.echarts_react.renderEchartDom();
   };
 
   componentDidMount() {
@@ -51,21 +56,18 @@ class Charts extends Component {
   }
 
   getOption() {
+    if (this.dataSrc.rows) {
+      return db.getChartOption(this.dataSrc);
+    }
     return {
       tooltip: {},
       xAxis: {
-        type: "category",
-        data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+        type: "category"
       },
       yAxis: {
         type: "value"
       },
-      series: [
-        {
-          data: [820, 932, 901, 934, 1290, 1330, 1320],
-          type: "line"
-        }
-      ]
+      series: []
     };
   }
 
@@ -80,9 +82,8 @@ class Charts extends Component {
           ref={e => {
             this.echarts_react = e;
           }}
-          option={this.getOption()}
-          style={{ height: "800px" }}
-          opts={{ renderer: "svg" }}
+          option={this.state.option}
+          style={{ height: "700px" }}
         />
       </Card>
     );

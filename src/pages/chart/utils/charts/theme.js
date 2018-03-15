@@ -46,7 +46,31 @@ export default {
       "rgb(38,185,139)"
     ]
   },
-  tooltip: { trigger: "item" },
+  tooltip: {
+    backgroundColor: "rgba(255,255,255,0.95)",
+    extraCssText:
+      "padding:20px;color:#999;border-radius:5px;box-shadow: 0 0 7px rgba(0, 0, 0, 0.6);",
+    textStyle: {
+      color: "#333"
+    },
+    trigger: "axis",
+    axisPointer: {
+      type: "cross",
+      lineStyle: {
+        color: "#aaa"
+      },
+      crossStyle: {
+        color: "#aaa"
+      },
+      shadowStyle: {
+        color: "rgba(128,200,128,0.1)"
+      },
+      label: {
+        backgroundColor: "#6a7985",
+        color: "#fff"
+      }
+    }
+  },
   grid: { borderWidth: 0, y: 80 },
   categoryAxis: {
     axisLine: { lineStyle: { color: "#aaa", width: 2 } },

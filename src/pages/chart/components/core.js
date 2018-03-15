@@ -1,11 +1,10 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import elementResizeEvent from "element-resize-event";
-import theme from "../utils/theme";
+import chartConfig from "../utils/charts";
 const R = require("ramda");
 
-const isEqual = (a, b) => R.equals(a, b); //;JSON.stringify(a) === JSON.stringify(b);
-
+const isEqual = (a, b) => R.equals(a, b);
 export default class EchartsReactCore extends Component {
   constructor(props) {
     super(props);
@@ -124,6 +123,7 @@ export default class EchartsReactCore extends Component {
     // init the echart object
     const echartObj = this.getEchartsInstance();
     // set the echart option
+
     echartObj.setOption(
       this.props.option,
       this.props.notMerge || false,
@@ -188,7 +188,7 @@ EchartsReactCore.defaultProps = {
   lazyUpdate: false,
   style: {},
   className: "",
-  theme,
+  theme: chartConfig.theme,
   onChartReady: () => {},
   showLoading: false,
   loadingOption: null,
