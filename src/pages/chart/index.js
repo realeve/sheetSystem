@@ -1,6 +1,6 @@
 import React from "react";
 import { connect } from "dva";
-import Table from "./components/Table";
+import Chart from "./components/Chart";
 import { DatePicker } from "antd";
 import styles from "./index.less";
 import dateRanges from "../../utils/ranges";
@@ -10,7 +10,7 @@ moment.locale("zh-cn");
 
 const RangePicker = DatePicker.RangePicker;
 
-function Tables({ dispatch, dateRange, config, loading }) {
+function Charts({ dispatch, dateRange, config, loading }) {
   const onDateChange = async (dates, dateStrings) => {
     const [tstart, tend] = dateStrings;
     await dispatch({
@@ -50,7 +50,7 @@ function Tables({ dispatch, dateRange, config, loading }) {
           className={id > 0 ? styles.tableContainer : ""}
           key={item.params.ID}
         >
-          <Table config={item} />
+          <Chart config={item} />
         </div>
       ))}
     </>
@@ -59,8 +59,8 @@ function Tables({ dispatch, dateRange, config, loading }) {
 
 function mapStateToProps(state) {
   return {
-    ...state.tableIndex
+    ...state.chartIndex
   };
 }
 
-export default connect(mapStateToProps)(Tables);
+export default connect(mapStateToProps)(Charts);
