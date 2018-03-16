@@ -26,49 +26,54 @@ let getCopyRight = () => {
   };
 };
 
-let handleDefaultOption = option => {
+let handleDefaultOption = (option, config) => {
   option = Object.assign(
     {
-      // color: ["#2C3E50", "#E74C3C", "#F1973A", "#3498DB", "#2980B9"],
-      toolbox: {
-        feature: {
-          dataZoom: {},
-          dataView: { readOnly: false },
-          magicType: { type: ["line", "bar", "stack", "tiled"] },
-          restore: {},
-          saveAsImage: { type: "svg" }
-        },
-        left: "left"
-      },
-      legend: {
-        top: 10,
-        left: "right"
-      },
+      toolbox: {},
       tooltip: {},
-      grid: {
-        left: 30,
-        right: 20,
-        top: 50,
-        bottom: 60
-      }
+      legend: {}
     },
     option
   );
-  option.title = option.title ? option.title : [];
-  option.title = [...option.title, getCopyRight()];
-  // option.title.push(getCopyRight());
+
+  let axisPointerType = "shadow";
+  let tooltipTrigger = "axis";
+  switch (config.type) {
+    case "bar":
+    case "histogram":
+      axisPointerType = "shadow";
+      break;
+    case "line":
+      axisPointerType = "cross";
+      break;
+    default:
+      tooltipTrigger = "item";
+      axisPointerType = "cross";
+      break;
+  }
+  option.tooltip = {
+    trigger: tooltipTrigger,
+    axisPointer: {
+      type: axisPointerType
+    }
+  };
+
+  option.title.push(getCopyRight());
   return option;
 };
 
 // 字符串转日期
 let str2Date = str => {
-  let needConvert = /^[1-9]\d{3}(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])$/.test(
+  let needConvert = /^[1-9]\d{3}(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])$|^[1-9]\d{3}(0[1-9]|1[0-2])$/.test(
     str
   );
   if (!needConvert) {
     return str;
   }
-  let dates = [str.substr(0, 4), str.substr(4, 2), str.substr(6, 2)];
+  let dates = [str.substr(0, 4), str.substr(4, 2)];
+  if (str.length === 8) {
+    dates[2] = str.substr(6, 2);
+  }
   return dates.join("-");
 };
 

@@ -29,6 +29,5 @@ export const getChartOption = data => {
   let config = util.getChartConfig();
   config.data = data;
   const opt = data.length === 0 ? {} : chartConfig.bar(config);
-  let option = util.handleDefaultOption(opt);
-  return option;
+  return util.handleDefaultOption(opt, config);
 };

@@ -33,6 +33,10 @@ export default {
     "#ffaa74"
   ],
   animationDuration: 1500,
+  // animationEasing: "elasticOut",
+  // animationEasingUpdate: "elasticOut",
+  // animationDelay: idx => idx * 20,
+  // animationDelayUpdate: idx => idx * 20,
   title: {
     itemGap: 8,
     textStyle: { fontWeight: "bold", color: "#666", fontSize: 28 },
@@ -44,7 +48,19 @@ export default {
       "rgb(38,185,139)",
       "rgb(38,185,139)",
       "rgb(38,185,139)"
-    ]
+    ],
+    feature: {
+      dataZoom: {},
+      // dataView: { readOnly: false },
+      magicType: { type: ["line", "bar", "stack", "tiled"] },
+      restore: {},
+      saveAsImage: { type: "png" } //'svg'
+    },
+    left: "left"
+  },
+  legend: {
+    top: 10,
+    left: "right"
   },
   tooltip: {
     backgroundColor: "rgba(255,255,255,0.95)",
@@ -71,29 +87,40 @@ export default {
       }
     }
   },
-  grid: { borderWidth: 0, y: 80 },
+  grid: {
+    borderWidth: 0,
+    left: 50,
+    right: 20,
+    top: 50,
+    bottom: 60
+    // containLabel: true
+  },
   categoryAxis: {
     axisLine: { lineStyle: { color: "#aaa", width: 2 } },
     boundaryGap: true,
-    splitLine: { show: false, lineStyle: { color: ["#ddd"], width: 1 } },
-    nameTextStyle: { fontSize: 16, color: "#555" },
+    splitLine: { show: false },
+    nameTextStyle: {
+      fontSize: 16,
+      color: "#555"
+    },
     axisLabel: { textStyle: { color: "#222" } },
     splitArea: {
-      show: false,
-      areaStyle: { color: ["rgba(144,238,144,0.2)", "rgba(255,255,255,0.05)"] }
+      show: false
     }
   },
   valueAxis: {
-    axisLine: { show: false, lineStyle: { color: "#bbb", width: 1 } },
+    axisLine: { show: false },
     axisLabel: { textStyle: { color: "#222" } },
-    nameTextStyle: { fontSize: 16, color: "#555" },
+    nameTextStyle: {
+      fontSize: 16,
+      color: "#555"
+    },
     splitLine: {
       lineStyle: { color: ["#ddd"], width: 1, type: "dashed" },
       show: true
     },
     splitArea: {
-      show: false,
-      areaStyle: { color: ["rgba(144,238,144,0.2)", "rgba(255,255,255,0.05)"] }
+      show: false
     }
   },
   timeline: {
@@ -262,5 +289,5 @@ export default {
     title: { textStyle: { color: "#333" } },
     detail: { textStyle: { color: "auto" } }
   },
-  textStyle: { fontFamily: "微软雅黑, Arial, Verdana, sans-serif" }
+  textStyle: { fontFamily: "等线,微软雅黑, Arial, Verdana" }
 };

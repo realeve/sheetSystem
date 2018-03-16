@@ -29,10 +29,8 @@ class Charts extends Component {
 
     this.setState({ loading: true });
     this.dataSrc = await db.fetchData(this.config);
-    const option = this.getOption();
-    this.setState({ loading: false, option });
+    this.hashChange();
     let end = new Date();
-
     console.log(
       "表格",
       this.config.params.ID,
@@ -40,11 +38,21 @@ class Charts extends Component {
       end.getTime() - start.getTime(),
       "ms"
     );
+  };
+
+  hashChange = () => {
+    const option = this.getOption();
+    this.setState({ loading: false, option });
     this.echarts_react.renderEchartDom();
+    console.log(`option=${JSON.stringify(option)}`);
   };
 
   componentDidMount() {
     this.init();
+
+    window.onhashchange = () => {
+      this.hashChange();
+    };
   }
 
   componentWillReceiveProps(nextProps) {
@@ -84,6 +92,7 @@ class Charts extends Component {
           }}
           option={this.state.option}
           style={{ height: "700px" }}
+          opts={{ renderer: "canvas" }}
         />
       </Card>
     );
