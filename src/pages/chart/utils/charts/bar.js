@@ -157,8 +157,7 @@ let bar = options => {
   };
 
   let yAxis = {
-    name: settings.axisName.y,
-    type: "value"
+    name: settings.axisName.y
   };
 
   if (options.max) {
@@ -226,7 +225,123 @@ let bar = options => {
     });
   }
 
-  return util.handleColor(option);
+  let configs = util.handleColor(option);
+  if (options.pareto) {
+    configs = handlePareto(option);
+  }
+  return configs;
+};
+
+const handlePareto = option => {
+  let yAxis = option.yAxis;
+  let { name } = yAxis;
+  option.yAxis = [
+    yAxis,
+    {
+      name: "帕累托(%)",
+      nameLocation: "middle",
+      nameGap: 15,
+      nameTextStyle: {
+        fontSize: 16
+      },
+      type: "value",
+      position: "right",
+      scale: true,
+      axisLabel: {
+        show: true,
+        interval: "auto",
+        margin: 10,
+        textStyle: {
+          fontSize: 16
+        }
+      },
+      axisTick: {
+        show: false
+      },
+      splitArea: {
+        show: false
+      },
+      max: 100,
+      min: 0
+    }
+  ];
+  option.legend = { data: [name, "Pareto"] };
+  option.series[0].name = name;
+
+  let { source } = option.dataset[0];
+  source = R.compose(
+    R.sortBy(R.descend(R.prop(1))),
+    R.map(item => {
+      item[1] = parseFloat(item[1]);
+      return item;
+    })
+  )(source);
+
+  let valueIndex = R.map(R.prop(1))(source);
+  valueIndex.forEach((item, i) => {
+    if (i < valueIndex.length - 1) {
+      valueIndex[i + 1] = parseInt(valueIndex[i + 1], 10) + parseInt(item, 10);
+    }
+  });
+  let sum = R.last(valueIndex);
+  valueIndex = R.map(item => (100 * parseInt(item, 10) / sum).toFixed(2))(
+    valueIndex
+  );
+
+  option.dataset[0].source = source.map((item, i) =>
+    item.concat(valueIndex[i])
+  );
+  option.dataset[0].dimensions.push("比例");
+
+  option.grid = { right: 50 };
+
+  option.series.push({
+    name: "Pareto",
+    encode: {
+      x: 0,
+      y: 2
+    },
+    datasetIndex: 0,
+    yAxisIndex: 1,
+    markLine: {
+      symbol: "none",
+      lineStyle: {
+        normal: {
+          type: "dot"
+        }
+      },
+      data: [
+        {
+          name: "80%",
+          yAxis: 80,
+          label: {
+            normal: {
+              show: false
+            }
+          }
+        }
+        // {
+        //   name: "80%",
+        //   xAxis: "1250"
+        // }
+      ]
+    },
+    type: "line",
+    smooth: true,
+    symbolSize: "4",
+    symbol: "circle",
+    lineStyle: {
+      normal: {
+        width: 2,
+        type: "solid",
+        shadowColor: "rgba(0,0,0,0)",
+        shadowBlur: 0,
+        shadowOffsetX: 0,
+        shadowOffsetY: 0
+      }
+    }
+  });
+  return option;
 };
 
 export { bar };
