@@ -50,7 +50,7 @@ function Charts({ dispatch, dateRange, config, loading }) {
           className={id > 0 ? styles.tableContainer : ""}
           key={item.params.ID}
         >
-          <Chart config={item} />
+          <Chart config={item} idx={id} />
         </div>
       ))}
     </>

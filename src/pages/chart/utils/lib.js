@@ -1,11 +1,21 @@
 import qs from "qs";
 const R = require("ramda");
 
-let getChartConfig = () => {
-  // let search = window.location.search.slice(1);
+let getChartConfig = idx => {
   let search = window.location.hash.slice(1);
   search = search.length ? search : "type=bar";
-  return qs.parse(search);
+  let params = qs.parse(search);
+  R.compose(
+    R.forEach(item => {
+      params[item] = params[item].split(",");
+      params[item] =
+        params[item].length - 1 < idx
+          ? R.last(params[item])
+          : params[item][idx];
+    }),
+    R.keys
+  )(params);
+  return params;
 };
 
 // let uniq = arr => Array.from(new Set(arr));

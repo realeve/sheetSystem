@@ -127,7 +127,7 @@ let getSetting = options => {
 let bar = options => {
   let settings = getSetting(options);
   let xAxis = {
-    type: settings.dateAxis ? "category" : "category", //'time'局限性太多
+    type: settings.dateAxis ? "time" : "category", //'time'局限性太多
     name: settings.axisName.x
   };
 

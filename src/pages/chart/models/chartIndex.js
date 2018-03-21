@@ -1,5 +1,5 @@
 import pathToRegexp from "path-to-regexp";
-import * as db from "../services/table";
+import * as db from "../services/chart";
 import dateRanges from "../../../utils/ranges";
 
 const namespace = "chartIndex";

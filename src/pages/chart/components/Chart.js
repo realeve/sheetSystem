@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Card } from "antd";
-import * as db from "../services/table";
+import * as db from "../services/chart";
 import styles from "./Chart.less";
 import ReactEcharts from "./echarts-for-react";
 
@@ -65,7 +65,8 @@ class Charts extends Component {
 
   getOption() {
     if (this.dataSrc.rows) {
-      return db.getChartOption(this.dataSrc);
+      // 根据地址栏参数顺序决定图表配置顺序
+      return db.getChartOption(this.dataSrc, this.props.idx);
     }
     return {
       tooltip: {},
