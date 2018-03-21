@@ -1,17 +1,20 @@
 import qs from "qs";
+import gColor from "./charts/gColor";
 const R = require("ramda");
 
 let getChartConfig = idx => {
-  let search = window.location.hash.slice(1);
+  // 先清除参数中的空格，全角逗号
+  let search = window.location.hash
+    .slice(1)
+    .replace(/，/g, ",")
+    .replace(/ /g, "");
   search = search.length ? search : "type=bar";
   let params = qs.parse(search);
   R.compose(
     R.forEach(item => {
-      params[item] = params[item].split(",");
-      params[item] =
-        params[item].length - 1 < idx
-          ? R.last(params[item])
-          : params[item][idx];
+      let param = params[item];
+      param = param.split(",");
+      params[item] = param.length - 1 < idx ? R.last(param) : param[idx];
     }),
     R.keys
   )(params);
@@ -87,10 +90,21 @@ let str2Date = str => {
   return dates.join("-");
 };
 
+let str2Num = str => {
+  if (/^(|\-)[0-9]+.[0-9]+$/.test(str)) {
+    return parseFloat(parseFloat(str).toFixed(3));
+  }
+  if (/^(|\-)[0-9]+$/.test(str)) {
+    return parseInt(str, 10);
+  }
+};
+
 export default {
   getChartConfig,
   uniq,
   getCopyRight,
   handleDefaultOption,
-  str2Date
+  str2Date,
+  str2Num,
+  handleColor: gColor.handleColor
 };

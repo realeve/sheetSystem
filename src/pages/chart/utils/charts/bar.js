@@ -1,4 +1,5 @@
 import util from "../lib";
+
 const R = require("ramda");
 
 let isDate = dateStr => {
@@ -60,26 +61,33 @@ let getSetting = options => {
     });
   }
 
+  // 堆叠数据需保证数据类型不为字符串
+  if (option.stack) {
+    data.data = R.map(item => {
+      item[option.y] = util.str2Num(item[option.y]);
+      return item;
+    })(data.data);
+  }
+
   // 柱状图不允许使用时间轴做x轴
   dateAxis = isDate(data.data[0][option.x]) && option.type !== "bar";
 
   if ("undefined" === option.legend) {
+    let seriesItem = {
+      type: option.type,
+      encode: {
+        x: option.x,
+        y: option.y
+      },
+      smooth: option.smooth
+    };
+    seriesItem = handleSeriesItem(option, seriesItem);
     return {
       dataset: {
         source: data.data,
         dimensions: header
       },
-      series: [
-        {
-          type: option.type,
-          encode: {
-            x: option.x,
-            y: option.y
-          },
-          stack: Reflect.get(option, "stack"),
-          smooth: option.smooth
-        }
-      ],
+      series: [seriesItem],
       dateAxis,
       axisName: {
         x: header[option.x],
@@ -100,10 +108,12 @@ let getSetting = options => {
         y: option.y
       },
       datasetIndex: i,
-      stack: Reflect.get(option, "stack"),
       smooth: option.smooth
       // boundaryGap: false
     };
+
+    seriesItem = handleSeriesItem(option, seriesItem);
+
     series.push(seriesItem);
     return {
       source: R.filter(R.propEq(option.legend, name))(data.data), //data.data.filter(item => item[option.legend] === legendItem),
@@ -122,17 +132,33 @@ let getSetting = options => {
   };
 };
 
+let handleSeriesItem = (option, seriesItem) => {
+  if (option.area && option.type !== "bar") {
+    seriesItem.areaStyle = {
+      normal: {
+        opacity: 0.4
+      }
+    };
+  }
+
+  if (option.stack) {
+    seriesItem.stack = "All";
+  }
+  return seriesItem;
+};
+
 // test URL: http://localhost:8000/chart/133#type=bar&x=0&y=1&smooth=1&max=100&min=70
 // http://localhost:8000/chart/145#type=line&legend=0&x=1&y=2&smooth=1&max=100&min=70
 let bar = options => {
   let settings = getSetting(options);
   let xAxis = {
-    type: settings.dateAxis ? "time" : "category", //'time'局限性太多
+    type: "category", //'time'局限性太多,比如不能使用stack等；settings.dateAxis ? "time" :
     name: settings.axisName.x
   };
 
   let yAxis = {
-    name: settings.axisName.y
+    name: settings.axisName.y,
+    type: "value"
   };
 
   if (options.max) {
@@ -200,7 +226,7 @@ let bar = options => {
     });
   }
 
-  return option;
+  return util.handleColor(option);
 };
 
 export { bar };
