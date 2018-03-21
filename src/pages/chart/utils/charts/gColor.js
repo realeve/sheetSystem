@@ -23,13 +23,12 @@ let handleColor = option => {
     return option;
   }
   let idx = 0;
-  let color = R.map(({ name }) => {
-    let c = gColor[name];
-    if (c) {
-      return c;
-    }
-    return theme.color[option.legend.data.length % idx++];
-  })(option.series);
+  let color = R.map(
+    ({ name }) =>
+      gColor[name]
+        ? gColor[name]
+        : theme.color[option.legend.data.length % idx++]
+  )(option.series);
   option.color = color;
   return option;
 };
