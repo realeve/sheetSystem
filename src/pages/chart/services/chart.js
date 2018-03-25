@@ -2,7 +2,7 @@
 import axios from "axios";
 import * as lib from "../../../utils/lib";
 import util from "../utils/lib";
-import chartOptioin from "../utils/charts";
+import chartOption from "../utils/charts";
 
 export const fetchData = async ({ url, params }) =>
   await axios({ url, params }).then(res => res.data);
@@ -29,7 +29,7 @@ export const getChartOption = (data, idx) => {
   let config = util.getChartConfig(idx);
   config.data = data;
   // console.log(config);
-  const opt = data.length === 0 ? {} : chartOptioin[config.type](config);
+  const opt = data.length === 0 ? {} : chartOption[config.type](config);
 
   return util.handleDefaultOption(opt, config);
 };
