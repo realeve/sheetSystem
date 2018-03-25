@@ -25,9 +25,10 @@ export const getQueryConfig = ({ tid, tstart, tend, idx }) => ({
   }
 });
 
-export const getChartOption = (data, idx) => {
+export const getChartOption = (data, idx, dateRange) => {
   let config = util.getChartConfig(idx);
   config.data = data;
+  config.dateRange = dateRange;
   // console.log(config);
   const opt = data.length === 0 ? {} : chartOption[config.type](config);
 

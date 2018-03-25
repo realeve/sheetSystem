@@ -44,7 +44,28 @@ let handleDefaultOption = (option, config) => {
     {
       toolbox: {},
       tooltip: {},
-      legend: {}
+      legend: {},
+      title: [
+        {
+          left: "center",
+          text: config.data.title
+        },
+        {
+          text: config.data.source,
+          borderWidth: 0,
+          textStyle: { fontSize: 10, fontWeight: "normal" },
+          x: 5,
+          y2: 0
+        },
+        {
+          text: `统计时间：${config.dateRange[0]} - ${config.dateRange[1]}`,
+          borderWidth: 0,
+          textStyle: { fontSize: 10, fontWeight: "normal" },
+          x: 5,
+          y2: 18
+        },
+        getCopyRight()
+      ]
     },
     option
   );
@@ -73,7 +94,6 @@ let handleDefaultOption = (option, config) => {
     };
   }
 
-  option.title.push(getCopyRight());
   return option;
 };
 

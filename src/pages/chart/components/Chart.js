@@ -66,7 +66,10 @@ class Charts extends Component {
   getOption() {
     if (this.dataSrc.rows) {
       // 根据地址栏参数顺序决定图表配置顺序
-      return db.getChartOption(this.dataSrc, this.props.idx);
+      return db.getChartOption(this.dataSrc, this.props.idx, [
+        this.config.params.tstart,
+        this.config.params.tend
+      ]);
     }
     return {
       tooltip: {},

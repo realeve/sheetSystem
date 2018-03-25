@@ -20,7 +20,7 @@ let standardPie = ({ option, config }) => {
     {
       name: header[option.x],
       type: "pie",
-      radius: "65%",
+      radius: option.doughnut ? ["30%", "65%"] : "65%",
       center: ["50%", "50%"],
       selectedMode: "single",
       data: seriesData,
@@ -36,12 +36,6 @@ let standardPie = ({ option, config }) => {
 
   return {
     series,
-    title: [
-      {
-        left: "center",
-        text: data.title
-      }
-    ],
     tooltip: {
       trigger: "item",
       formatter: "{a} <br/>{b}: {c} ({d}%)"

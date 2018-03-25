@@ -180,12 +180,6 @@ let bar = options => {
   yAxis = Object.assign(yAxis, axisOption);
 
   var option = {
-    title: [
-      {
-        left: "center",
-        text: options.data.title
-      }
-    ],
     dataset: settings.dataset,
     yAxis,
     xAxis,
