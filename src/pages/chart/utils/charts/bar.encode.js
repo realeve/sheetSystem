@@ -90,15 +90,13 @@ let getSetting = options => {
       axisName: {
         x: header[option.x],
         y: header[option.y]
-      },
-      x: option.x,
-      y: option.y
+      }
     };
   }
 
-  let series = [];
   let legend = R.compose(R.uniq, R.map(R.nth(option.legend)))(data.data);
 
+  let series = [];
   let dataset = legend.map((name, i) => {
     let seriesItem = {
       name,
@@ -125,7 +123,6 @@ let getSetting = options => {
       sourceHeader: false
     };
   });
-
   return {
     dataset,
     series,
@@ -133,9 +130,7 @@ let getSetting = options => {
     axisName: {
       x: header[option.x],
       y: header[option.y]
-    },
-    x: option.x,
-    y: option.y
+    }
   };
 };
 
@@ -158,7 +153,6 @@ let handleSeriesItem = (option, seriesItem) => {
 // http://localhost:8000/chart/145#type=line&legend=0&x=1&y=2&smooth=1&max=100&min=70
 let bar = options => {
   let settings = getSetting(options);
-
   let xAxis = {
     type: "category", //'time'局限性太多,比如不能使用stack等；settings.dateAxis ? "time" :
     name: settings.axisName.x
@@ -216,15 +210,11 @@ let bar = options => {
     option.yAxis = xAxis;
     option.series = option.series.map(item => {
       item.encode = {
-        x: parseInt(settings.y, 10),
-        y: parseInt(settings.x, 10)
+        x: parseInt(options.y, 10),
+        y: parseInt(options.x, 10)
       };
       return item;
     });
-    option.grid = {
-      left: 100
-    };
-    option.yAxis.nameGap = 70;
   }
 
   if (options.zoom) {
