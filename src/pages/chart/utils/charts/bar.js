@@ -50,7 +50,7 @@ let getSetting = options => {
   }
 
   // X轴为时间轴
-  let dateAxis = util.needConvertDate(data.data[0][option.x]);
+  let dateAxis = util.needConvertDate(R.path([0, option.x], data.data));
 
   if (dateAxis) {
     data.data = R.map(item =>
@@ -70,7 +70,9 @@ let getSetting = options => {
   }
 
   // 柱状图不允许使用时间轴做x轴
-  dateAxis = util.isDate(data.data[0][option.x]) && option.type !== "bar";
+  dateAxis =
+    util.isDate(R.path([0, option.x], data.data)) &&
+    R.not(R.propEq("type", "bar")(option));
 
   if ("undefined" === option.legend) {
     let seriesItem = {
@@ -270,11 +272,8 @@ const handlePareto = option => {
 
   let { source } = option.dataset[0];
   source = R.compose(
-    R.sortBy(R.descend(R.prop(1))),
-    R.map(item => {
-      item[1] = parseFloat(item[1]);
-      return item;
-    })
+    R.sortBy(R.descend(R.nth(1))),
+    R.map(item => R.update(1, parseFloat(R.nth(1)(item)))(item))
   )(source);
 
   let valueIndex = R.map(R.prop(1))(source);
@@ -291,6 +290,7 @@ const handlePareto = option => {
   option.dataset[0].source = source.map((item, i) =>
     item.concat(valueIndex[i])
   );
+
   option.dataset[0].dimensions.push("比例");
 
   option.grid = { right: 50 };

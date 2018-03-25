@@ -27,7 +27,7 @@ let uniq = arr => R.uniq(arr);
 
 let getCopyRight = () => {
   return {
-    text: "©成都印钞有限公司 印钞管理部",
+    text: "©xx有限公司 xx部",
     borderColor: "#999",
     borderWidth: 0,
     textStyle: {
