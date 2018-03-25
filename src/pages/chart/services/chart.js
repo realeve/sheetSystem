@@ -28,6 +28,8 @@ export const getQueryConfig = ({ tid, tstart, tend, idx }) => ({
 export const getChartOption = (data, idx) => {
   let config = util.getChartConfig(idx);
   config.data = data;
-  const opt = data.length === 0 ? {} : chartOptioin.bar(config);
+  // console.log(config);
+  const opt = data.length === 0 ? {} : chartOptioin[config.type](config);
+
   return util.handleDefaultOption(opt, config);
 };

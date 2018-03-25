@@ -49,27 +49,29 @@ let handleDefaultOption = (option, config) => {
     option
   );
 
-  let axisPointerType = "shadow";
-  let tooltipTrigger = "axis";
-  switch (config.type) {
-    case "bar":
-    case "histogram":
-      axisPointerType = "shadow";
-      break;
-    case "line":
-      axisPointerType = "cross";
-      break;
-    default:
-      tooltipTrigger = "item";
-      axisPointerType = "cross";
-      break;
-  }
-  option.tooltip = {
-    trigger: tooltipTrigger,
-    axisPointer: {
-      type: axisPointerType
+  if (["bar", "histogram", "line"].includes(config.type)) {
+    let axisPointerType = "shadow";
+    let tooltipTrigger = "axis";
+    switch (config.type) {
+      case "bar":
+      case "histogram":
+        axisPointerType = "shadow";
+        break;
+      case "line":
+        axisPointerType = "cross";
+        break;
+      default:
+        tooltipTrigger = "item";
+        axisPointerType = "cross";
+        break;
     }
-  };
+    option.tooltip = {
+      trigger: tooltipTrigger,
+      axisPointer: {
+        type: axisPointerType
+      }
+    };
+  }
 
   option.title.push(getCopyRight());
   return option;

@@ -271,10 +271,10 @@ const handlePareto = option => {
   option.series[0].name = name;
 
   let { source } = option.dataset[0];
-  source = R.compose(
-    R.sortBy(R.descend(R.nth(1))),
-    R.map(item => R.update(1, parseFloat(R.nth(1)(item)))(item))
-  )(source);
+  const g = i => j => R.update(1, parseFloat(R.nth(1)(i)))(j);
+  source = R.compose(R.sortBy(R.descend(R.nth(1))), R.map(i => g(i)(i)))(
+    source
+  );
 
   let valueIndex = R.map(R.prop(1))(source);
   valueIndex.forEach((item, i) => {
