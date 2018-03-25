@@ -2,18 +2,6 @@ import util from "../lib";
 
 const R = require("ramda");
 
-let isDate = dateStr => {
-  return /^[1-9]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])|^[1-9]\d{3}(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])$/.test(
-    dateStr
-  );
-};
-
-let needConvertDate = dateStr => {
-  return /^[1-9]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])|^[1-9]\d{3}(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])$|^[1-9]\d{3}(0[1-9]|1[0-2])$/.test(
-    dateStr
-  );
-};
-
 let getSetting = options => {
   // const haveLegend = Reflect.has(options, "legend");
   let option;
@@ -43,34 +31,46 @@ let getSetting = options => {
     options
   );
 
-  option.x = parseInt(option.x, 10);
-  option.y = parseInt(option.y, 10);
-  option.legend = parseInt(option.legend, 10);
+  // option.x = parseInt(option.x, 10);
+  // option.y = parseInt(option.y, 10);
+  // option.legend = parseInt(option.legend, 10);
+  R.forEach(key => (option[key] = parseInt(option[key], 10)))([
+    "x",
+    "y",
+    "legend"
+  ]);
+
   option.smooth = option.smooth !== "0";
 
-  let data = options.data;
-  let header = R.map(R.prop("title"))(data.header);
+  let { data } = options;
+
+  let { header } = data;
+  if (R.compose((R.equals, R.type, R.nth(0), "Object"))) {
+    header = R.map(R.prop("title"))(header);
+  }
 
   // X轴为时间轴
-  let dateAxis = needConvertDate(data.data[0][option.x]);
+  let dateAxis = util.needConvertDate(data.data[0][option.x]);
 
   if (dateAxis) {
-    data.data = data.data.map(item => {
-      item[option.x] = util.str2Date(item[option.x]);
-      return item;
-    });
+    data.data = R.map(item =>
+      R.update(option.x, util.str2Date(R.nth(option.x, item)))(item)
+    )(data.data);
   }
 
   // 堆叠数据需保证数据类型不为字符串
   if (option.stack) {
-    data.data = R.map(item => {
-      item[option.y] = util.str2Num(item[option.y]);
-      return item;
-    })(data.data);
+    // data.data = R.map(item => {
+    //   item[option.y] = util.str2Num(item[option.y]);
+    //   return item;
+    // })(data.data);
+    data.data = R.map(item =>
+      R.update(option.y, util.str2Num(R.nth(option.y, item)))(item)
+    )(data.data);
   }
 
   // 柱状图不允许使用时间轴做x轴
-  dateAxis = isDate(data.data[0][option.x]) && option.type !== "bar";
+  dateAxis = util.isDate(data.data[0][option.x]) && option.type !== "bar";
 
   if ("undefined" === option.legend) {
     let seriesItem = {
@@ -96,7 +96,7 @@ let getSetting = options => {
     };
   }
 
-  let legend = R.compose(R.uniq, R.map(R.prop(option.legend)))(data.data);
+  let legend = R.compose(R.uniq, R.map(R.nth(option.legend)))(data.data);
 
   let series = [];
   let dataset = legend.map((name, i) => {

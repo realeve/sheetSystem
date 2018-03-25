@@ -99,8 +99,22 @@ let str2Num = str => {
   }
 };
 
+let isDate = dateStr => {
+  return /^[1-9]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])|^[1-9]\d{3}(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])$/.test(
+    dateStr
+  );
+};
+
+let needConvertDate = dateStr => {
+  return /^[1-9]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])|^[1-9]\d{3}(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])$|^[1-9]\d{3}(0[1-9]|1[0-2])$/.test(
+    dateStr
+  );
+};
+
 export default {
   getChartConfig,
+  isDate,
+  needConvertDate,
   uniq,
   getCopyRight,
   handleDefaultOption,
