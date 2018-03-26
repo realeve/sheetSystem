@@ -11,10 +11,16 @@ let standardPie = ({ option, config }) => {
     header = R.map(R.prop("title"))(header);
   }
 
-  let seriesData = R.map(item => ({
-    name: R.nth(option.x, item),
-    value: R.nth(option.y, item)
-  }))(data);
+  // let seriesData = R.map(item => ({
+  //   name: R.nth(option.x, item),
+  //   value: R.nth(option.y, item)
+  // }))(data);
+
+  let seriesData = R.map(item => {
+    let [name, value] = [R.nth(option.x, item), R.nth(option.y, item)];
+    return { name, value };
+  })(data);
+  console.log(seriesData);
 
   let series = [
     {
