@@ -53,16 +53,18 @@ let getSetting = options => {
   let dateAxis = util.needConvertDate(R.path([0, option.x], data.data));
 
   if (dateAxis) {
-    data.data = R.map(item =>
-      R.update(option.x, util.str2Date(R.nth(option.x, item)))(item)
-    )(data.data);
+    // data.data = R.map(item =>
+    //   R.update(option.x, util.str2Date(R.nth(option.x, item)))(item)
+    // )(data.data);
+    data.data = R.map(R.adjust(util.str2Date, option.x))(data.data);
   }
 
   // 堆叠数据需保证数据类型不为字符串
   if (option.stack) {
-    data.data = R.map(item =>
-      R.update(option.y, util.str2Num(R.nth(option.y, item)))(item)
-    )(data.data);
+    // data.data = R.map(item =>
+    //   R.update(option.y, util.str2Num(R.nth(option.y, item)))(item)
+    // )(data.data);
+    data.data = R.map(R.adjust(util.str2Num, option.y))(data.data);
   }
 
   // 柱状图不允许使用时间轴做x轴
@@ -90,13 +92,15 @@ let getSetting = options => {
       axisName: {
         x: header[option.x],
         y: header[option.y]
-      }
+      },
+      x: option.x,
+      y: option.y
     };
   }
 
+  let series = [];
   let legend = R.compose(R.uniq, R.map(R.nth(option.legend)))(data.data);
 
-  let series = [];
   let dataset = legend.map((name, i) => {
     let seriesItem = {
       name,
@@ -123,6 +127,7 @@ let getSetting = options => {
       sourceHeader: false
     };
   });
+
   return {
     dataset,
     series,
@@ -130,7 +135,9 @@ let getSetting = options => {
     axisName: {
       x: header[option.x],
       y: header[option.y]
-    }
+    },
+    x: option.x,
+    y: option.y
   };
 };
 
@@ -153,6 +160,7 @@ let handleSeriesItem = (option, seriesItem) => {
 // http://localhost:8000/chart/145#type=line&legend=0&x=1&y=2&smooth=1&max=100&min=70
 let bar = options => {
   let settings = getSetting(options);
+
   let xAxis = {
     type: "category", //'time'局限性太多,比如不能使用stack等；settings.dateAxis ? "time" :
     name: settings.axisName.x
@@ -208,13 +216,23 @@ let bar = options => {
   if (options.reverse) {
     option.xAxis = yAxis;
     option.yAxis = xAxis;
-    option.series = option.series.map(item => {
-      item.encode = {
-        x: parseInt(options.y, 10),
-        y: parseInt(options.x, 10)
-      };
-      return item;
-    });
+    // option.series = option.series.map(item => {
+    //   item.encode = {
+    //     x: parseInt(settings.y, 10),
+    //     y: parseInt(settings.x, 10)
+    //   };
+    //   return item;
+    // });
+    let encode = {
+      x: parseInt(settings.y, 10),
+      y: parseInt(settings.x, 10)
+    };
+    option.series = R.map(R.assoc("encode", encode))(option.series);
+
+    option.grid = {
+      left: 100
+    };
+    option.yAxis.nameGap = 70;
   }
 
   if (options.zoom) {
@@ -288,10 +306,14 @@ const handlePareto = option => {
   option.series[0].name = name;
 
   let { source } = option.dataset[0];
-  const g = i => j => R.update(1, parseFloat(R.nth(1)(i)))(j);
-  source = R.compose(R.sortBy(R.descend(R.nth(1))), R.map(i => g(i)(i)))(
-    source
-  );
+  // const g = i => j => R.update(1, parseFloat(R.nth(1)(i)))(j);
+  // source = R.compose(R.sortBy(R.descend(R.nth(1))), R.map(i => g(i)(i)))(
+  //   source
+  // );
+  source = R.compose(
+    R.sortBy(R.descend(R.nth(1))),
+    R.map(R.adjust(parseFloat, 1))
+  )(source);
 
   let valueIndex = R.map(R.prop(1))(source);
   valueIndex.forEach((item, i) => {

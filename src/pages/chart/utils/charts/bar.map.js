@@ -34,7 +34,6 @@ let getOption = options => {
     "legend"
   ]);
   option.smooth = option.smooth !== "0";
-  return option;
 };
 
 let handleDataWithLegend = (srcData, option) => {
@@ -83,7 +82,7 @@ let handleData = (srcData, option) => {
   return handleDataNoLegend(srcData, option);
 };
 
-let handleSeriesItem = option => seriesItem => {
+let handleSeriesItem = seriesItem => option => {
   if (option.area && option.type !== "bar") {
     seriesItem.areaStyle = {
       normal: {
@@ -95,14 +94,6 @@ let handleSeriesItem = option => seriesItem => {
   if (option.stack) {
     seriesItem.stack = "All";
   }
-
-  // 堆叠数据需保证数据类型不为字符串
-  if (option.stack) {
-    seriesItem = R.assoc("data", R.map(util.str2Num)(seriesItem.data))(
-      seriesItem
-    );
-  }
-
   return seriesItem;
 };
 
@@ -115,12 +106,15 @@ let getChartConfig = options => {
   }
 
   let { xAxis, series } = handleData(data, option);
-
   let dateAxis = util.needConvertDate(R.path(["xAxis", 0], xAxis));
   if (dateAxis) {
     xAxis = R.map(util.str2Date)(xAxis);
   }
 
+  // 堆叠数据需保证数据类型不为字符串
+  if (option.stack) {
+    series = R.map(R.assoc("data", util.str2Num))(series);
+  }
   series = R.map(handleSeriesItem(option))(series);
 
   let axisOption = {
