@@ -56,7 +56,12 @@ export default {
         payload: query
       });
     },
-    *updateConfig({ payload: { tstart, tend } }, { put, call, select }) {
+    *updateConfig(
+      {
+        payload: { tstart, tend }
+      },
+      { put, call, select }
+    ) {
       const { tid, query } = yield select(state => state.tableIndex);
       const config = tid.map(
         item =>
