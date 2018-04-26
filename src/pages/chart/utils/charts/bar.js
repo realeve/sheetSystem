@@ -261,7 +261,7 @@ const handlePareto = option => {
   option.legend = { data: [name, "Pareto"] };
   option.series[0].name = name;
 
-  let { source } = option.dataset[0];
+  let source = option.series[0].data;
   // const g = i => j => R.update(1, parseFloat(R.nth(1)(i)))(j);
   // source = R.compose(R.sortBy(R.descend(R.nth(1))), R.map(i => g(i)(i)))(
   //   source
@@ -271,33 +271,23 @@ const handlePareto = option => {
     R.map(R.adjust(parseFloat, 1))
   )(source);
 
-  let valueIndex = R.map(R.prop(1))(source);
+  let valueIndex = source;
   valueIndex.forEach((item, i) => {
     if (i < valueIndex.length - 1) {
       valueIndex[i + 1] = parseInt(valueIndex[i + 1], 10) + parseInt(item, 10);
     }
   });
   let sum = R.last(valueIndex);
-  valueIndex = R.map(item => (100 * parseInt(item, 10) / sum).toFixed(2))(
+  let paretoData = R.map(item => (100 * parseInt(item, 10) / sum).toFixed(2))(
     valueIndex
   );
-
-  option.dataset[0].source = source.map((item, i) =>
-    item.concat(valueIndex[i])
-  );
-
-  option.dataset[0].dimensions.push("比例");
 
   option.grid = { right: 50 };
 
   option.series.push({
     name: "Pareto",
-    encode: {
-      x: 0,
-      y: 2
-    },
-    datasetIndex: 0,
     yAxisIndex: 1,
+    data: paretoData,
     markLine: {
       symbol: "none",
       lineStyle: {
