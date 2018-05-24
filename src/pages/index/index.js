@@ -46,7 +46,7 @@ function Tables({ dispatch, dateRange, loading, dataSource }) {
         </div>
       </div>
       {dataSource.map((dataSrc, key) => (
-        <div key={key} className={key ? styles.tableContainer : ""}>
+        <div key={key} className={key ? styles.tableContainer : null}>
           <Table dataSrc={dataSrc} />
         </div>
       ))}

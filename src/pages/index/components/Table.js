@@ -205,7 +205,7 @@ class Tables extends Component {
 
   downloadPdf = () => {
     const config = this.getExportConfig();
-    config.download = "open";
+    config.download = "download";
     config.title = this.dataSrc.title;
     pdf(config);
   };

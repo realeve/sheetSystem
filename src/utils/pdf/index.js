@@ -63,15 +63,13 @@ const pdf = config => {
   let doc = {
     pageSize: config.pageSize,
     pageOrientation: config.orientation,
-    content: [
-      {
-        table: {
-          headerRows: 1,
-          body: rows
-        },
-        layout: "headerLineOnly"
-      }
-    ],
+    content: [{
+      table: {
+        headerRows: 1,
+        body: rows
+      },
+      layout: "headerLineOnly"
+    }],
     styles: {
       tableHeader: {
         bold: true,
