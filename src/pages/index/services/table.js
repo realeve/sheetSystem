@@ -1,14 +1,18 @@
-// import request from "../../../utils/request";
-import axios from "axios";
 import * as lib from "../../../utils/lib";
+import { uploadHost, axios } from "../../../utils/axios";
+import styles from "../components/Table.less";
+
 const R = require("ramda");
 
 export const fetchData = async ({ url, params }) =>
-  await axios({ url, params }).then(res => res.data);
+  await axios({ url, params });
 
 const isFilterColumn = (data, key) => {
   let isValid = true;
   const handleItem = item => {
+    if (R.isNil(item)) {
+      isValid = false;
+    }
     if (isValid) {
       item = item.trim();
       let isNum = lib.isNumOrFloat(item);
@@ -18,21 +22,30 @@ const isFilterColumn = (data, key) => {
       }
     }
   };
-
   let uniqColumn = R.compose(R.uniq, R.map(R.prop(key)))(data);
   R.map(handleItem)(uniqColumn);
-
-  return { uniqColumn, filters: isValid };
+  return {
+    uniqColumn,
+    filters: isValid
+  };
 };
 
-export function handleColumns({ dataSrc, filteredInfo }) {
+export function handleColumns(
+  { dataSrc, filteredInfo },
+  cartLinkMode = "search"
+) {
   let { data, header, rows } = dataSrc;
   let showURL = typeof data !== "undefined" && rows > 0;
   if (!rows || rows === 0) {
     return [];
   }
-  let column = header.map((item, i) => {
+
+  let column = header.map((title, i) => {
     let key = "col" + i;
+    let item = {
+      title
+    };
+
     item.dataIndex = key;
     // item.key = key;
 
@@ -46,18 +59,38 @@ export function handleColumns({ dataSrc, filteredInfo }) {
       return item;
     }
 
-    if (lib.isCartOrReel(tdValue)) {
+    const isCart = lib.isCart(tdValue);
+    if (lib.isReel(tdValue) || isCart) {
       item.render = text => {
+        let url = lib.searchUrl;
+        if (isCart && cartLinkMode !== "search") {
+          url = lib.imgUrl;
+        }
         const attrs = {
-          href: lib.searchUrl + text,
+          href: url + text,
           target: "_blank"
         };
-        return <a {...attrs}>{text}</a>;
+        return <a {...attrs}> {text} </a>;
       };
       return item;
     } else if (lib.isInt(tdValue) && !lib.isDateTime(tdValue)) {
       item.render = text => parseInt(text, 10).toLocaleString();
       return item;
+    } else {
+      item.render = text => {
+        text = R.isNil(text) ? "" : text;
+        let isImg =
+          String(text).includes("image/") || String(text).includes("/file/");
+        return !isImg ? (
+          text
+        ) : (
+          <img
+            className={styles.imgContent}
+            src={`${uploadHost}${text}`}
+            alt={text}
+          />
+        );
+      };
     }
 
     let fInfo = isFilterColumn(data, key);
@@ -72,6 +105,7 @@ export function handleColumns({ dataSrc, filteredInfo }) {
     }
     return item;
   });
+
   return column;
 }
 
@@ -110,20 +144,60 @@ export function handleSort({ dataClone, field, order }) {
 export const getPageData = ({ data, page, pageSize }) =>
   data.slice((page - 1) * pageSize, page * pageSize);
 
-export const getQueryConfig = ({ tid, tstart, tend, idx }) => ({
-  type: "fetchAPIData",
-  payload: {
-    url: lib.apiHost,
-    params: {
-      ID: tid,
-      cache: 10,
-      tstart,
-      tend,
-      tstart2: tstart,
-      tend2: tend,
-      tstart3: tstart,
-      tend3: tend
-    },
-    idx
+export const handleSrcData = data => {
+  if (data.length === 0) {
+    return data;
   }
-});
+  data.data = data.data.map((item, i) => [i + 1, ...item]);
+  data.header = ["", ...data.header];
+  if (data.rows) {
+    data.data = data.data.map((item, key) => {
+      let col = {
+        key
+      };
+      item.forEach((td, idx) => {
+        col["col" + idx] = td;
+      });
+      return col;
+    });
+  }
+  return data;
+};
+
+export const handleParams = ({ tid, params, dateRange }) => {
+  const [tstart, tend] = dateRange;
+  let param = {
+    tstart,
+    tend,
+    tstart2: tstart,
+    tend2: tend,
+    tstart3: tstart,
+    tend3: tend
+  };
+  let option = tid.map(url => ({
+    url: url + "/array",
+    params: param
+  }));
+  let paramKeys = Object.keys(params);
+
+  // 对传入参数补齐
+  paramKeys.forEach(key => {
+    let val = params[key];
+    if (R.is(String, val)) {
+      val = [val];
+    }
+    let lastVal = R.last(val);
+    // 对后几个元素填充数据
+    for (let i = val.length; i < option.length; i++) {
+      val[i] = lastVal;
+    }
+    params[key] = val;
+  });
+
+  return option.map((item, idx) => {
+    paramKeys.forEach(key => {
+      item.params[key] = params[key][idx];
+    });
+    return JSON.parse(JSON.stringify(item));
+  });
+};

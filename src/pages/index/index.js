@@ -10,17 +10,17 @@ moment.locale("zh-cn");
 
 const RangePicker = DatePicker.RangePicker;
 
-function Tables({ dispatch, dateRange, config, loading }) {
+function Tables({ dispatch, dateRange, loading, dataSource }) {
   const onDateChange = async (dates, dateStrings) => {
-    const [tstart, tend] = dateStrings;
     await dispatch({
-      type: "tableIndex/setDateRange",
-      payload: dateStrings
+      type: "table/setDateRange",
+      payload: { dateStrings }
     });
-
     await dispatch({
-      type: "tableIndex/updateConfig",
-      payload: { tstart, tend }
+      type: "table/updateParams"
+    });
+    dispatch({
+      type: "table/refreshData"
     });
   };
 
@@ -45,12 +45,9 @@ function Tables({ dispatch, dateRange, config, loading }) {
           <DateRangePicker />
         </div>
       </div>
-      {config.map((item, id) => (
-        <div
-          className={id > 0 ? styles.tableContainer : ""}
-          key={item.params.ID}
-        >
-          <Table config={item} />
+      {dataSource.map((dataSrc, key) => (
+        <div key={key} className={key ? styles.tableContainer : ""}>
+          <Table dataSrc={dataSrc} />
         </div>
       ))}
     </>
@@ -59,7 +56,7 @@ function Tables({ dispatch, dateRange, config, loading }) {
 
 function mapStateToProps(state) {
   return {
-    ...state.tableIndex
+    ...state.table
   };
 }
 

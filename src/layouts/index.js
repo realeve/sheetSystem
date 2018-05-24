@@ -1,20 +1,20 @@
-import React, { Component } from 'react'
+import React, { Component } from "react";
 
-import 'ant-design-pro/dist/ant-design-pro.css'; // 统一引入样式
+import "ant-design-pro/dist/ant-design-pro.css"; // 统一引入样式
 
-import styles from './index.less';
-import Header from './Header';
-import withRouter from 'umi/withRouter';
+import styles from "./index.less";
+import Header from "./Header";
+import withRouter from "umi/withRouter";
 
-import { Layout, Breadcrumb } from 'antd';
+import { Layout, Breadcrumb } from "antd";
 const { Content, Footer } = Layout;
 
 class Index extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      curPageName: ''
-    }
+      curPageName: ""
+    };
   }
 
   // 组件加载前更新菜单ID
@@ -22,21 +22,18 @@ class Index extends Component {
     const { pathname } = this.props.location;
     let curPageName;
     switch (pathname) {
-      case '/receive':
-      case '/users':
-        curPageName = "任务领取"
+      case "/chart":
+        curPageName = "图表";
         break;
-      case '/report':
-        curPageName = "数据报表"
-        break;
-      case '/':
+      case "/":
+      case "/index":
       default:
-        curPageName = "任务发布"
+        curPageName = "报表";
         break;
     }
     this.setState({
       curPageName
-    })
+    });
   }
 
   render() {
@@ -50,15 +47,13 @@ class Index extends Component {
             <Breadcrumb.Item>主页</Breadcrumb.Item>
             <Breadcrumb.Item>{this.state.curPageName}</Breadcrumb.Item>
           </Breadcrumb>
-          <div className={styles.content}>
-            {children}
-          </div>
+          <div className={styles.content}>{children}</div>
         </Content>
         <Footer className={styles.footer}>
           cbpc ©2018 All rights reserved.
         </Footer>
       </Layout>
-    )
+    );
   }
 }
 

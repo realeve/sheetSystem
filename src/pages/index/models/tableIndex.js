@@ -1,114 +1,173 @@
 import pathToRegexp from "path-to-regexp";
 import * as db from "../services/table";
 import dateRanges from "../../../utils/ranges";
+const R = require('ramda');
 
-const namespace = "tableIndex";
+const namespace = "table";
 export default {
   namespace,
   state: {
     dateRange: [],
     tid: [],
-    config: {},
-    query: {}
+    dataSource: [],
+    params: [],
+    axiosOptions: []
   },
   reducers: {
-    setTid(state, { payload: tid }) {
+    updateTid(state, {
+      payload: {
+        tid,
+        params
+      }
+    }) {
       return {
         ...state,
-        tid
+        tid,
+        params
       };
     },
-    setDateRange(state, { payload: dateRange }) {
+    setDateRange(state, {
+      payload: {
+        dateRange,
+        tid,
+        params
+      }
+    }) {
+      if (state.tid.length) {
+        tid = state.tid;
+        params = state.params;
+      }
+
       return {
         ...state,
-        dateRange
+        dateRange,
+        tid,
+        params
       };
     },
-    setConfig(state, { payload: config }) {
+    saveData(state, {
+      payload: {
+        dataSource
+      }
+    }) {
       return {
         ...state,
-        config
-      };
+        dataSource
+      }
     },
-    setQuery(state, { payload: query }) {
+    setParams(state, {
+      payload: params
+    }) {
       return {
         ...state,
-        query
-      };
+        params
+      }
+    },
+    setAxiosOptions(state, {
+      payload: axiosOptions
+    }) {
+      return {
+        ...state,
+        axiosOptions,
+      }
     }
   },
   effects: {
-    *updateDateRange({ payload: dateRange }, { put }) {
-      yield put({
-        type: "setDateRange",
-        payload: dateRange
+    * updateParams(payload, {
+      put,
+      call,
+      select
+    }) {
+      const {
+        dateRange,
+        params,
+        tid
+      } = yield select(state => state[namespace]);
+
+      let param = yield call(db.handleParams, {
+        params,
+        tid,
+        dateRange
       });
-    },
-    *updateTid({ payload: tid }, { put }) {
       yield put({
-        type: "setTid",
-        payload: tid
-      });
+        type: 'setAxiosOptions',
+        payload: param
+      })
     },
-    *updateQuery({ payload: query }, { put }) {
+    * refreshData(payload, {
+      call,
+      put,
+      select
+    }) {
+      const store = yield select(state => state[namespace]);
+      let {
+        axiosOptions,
+        dataSource
+      } = store;
+
+      for (let idx = 0; idx < axiosOptions.length; idx++) {
+        dataSource[idx] = yield call(db.fetchData, axiosOptions[idx])
+      }
+
       yield put({
-        type: "setQuery",
-        payload: query
-      });
-    },
-    *updateConfig(
-      {
-        payload: { tstart, tend }
-      },
-      { put, call, select }
-    ) {
-      const { tid, query } = yield select(state => state.tableIndex);
-      const config = tid.map(
-        item =>
-          db.getQueryConfig({
-            ...query,
-            tid: item,
-            tstart,
-            tend
-          }).payload
-      );
-      yield put({
-        type: "setConfig",
-        payload: config
+        type: "saveData",
+        payload: {
+          dataSource
+        }
       });
     }
   },
   subscriptions: {
-    setup({ dispatch, history }) {
-      return history.listen(({ pathname, query }) => {
-        const match = pathToRegexp("/index/:tid").exec(pathname);
+    setup({
+      dispatch,
+      history
+    }) {
+      return history.listen(({
+        pathname,
+        query
+      }) => {
+        const {
+          id
+        } = query;
+        let params = R.clone(query);
+        Reflect.deleteProperty(params, 'id');
+
+        let needRefresh = id && id.length
+
+        // 初始化数据
+        if (needRefresh) {
+          let dataSource = id.map(() => [])
+          dispatch({
+            type: "saveData",
+            payload: {
+              dataSource
+            }
+          });
+        }
+
+        const match = pathToRegexp("/").exec(pathname);
         if (match) {
           const [tstart, tend] = dateRanges["去年同期"];
           const [ts, te] = [tstart.format("YYYYMMDD"), tend.format("YYYYMMDD")];
           dispatch({
             type: "setDateRange",
-            payload: [ts, te]
-          });
-
-          const tid = match[1].split(",");
-
-          dispatch({
-            type: "updateTid",
-            payload: tid
-          });
-
-          dispatch({
-            type: "updateQuery",
-            payload: query
-          });
-
-          dispatch({
-            type: "updateConfig",
             payload: {
-              tstart: ts,
-              tend: te
+              dateRange: [ts, te],
+              tid: id,
+              params
             }
           });
+
+          dispatch({
+            type: 'updateParams'
+          })
+
+          if (needRefresh) {
+            dispatch({
+              type: "refreshData"
+            });
+          }
+
         }
       });
     }

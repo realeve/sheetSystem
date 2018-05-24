@@ -22,8 +22,7 @@ const Search = Input.Search;
 class Tables extends Component {
   constructor(props) {
     super(props);
-    this.config = props.config;
-    this.dataSrc = [];
+    this.dataSrc = props.dataSrc;
     this.dataClone = [];
     this.dataSearchClone = [];
 
@@ -37,26 +36,11 @@ class Tables extends Component {
       timing: "",
       filteredInfo: {},
       sortedInfo: {},
-      loading: false
+      loading: props.loading
     };
   }
 
   init = async () => {
-    let start = new Date();
-
-    this.setState({ loading: true });
-    this.dataSrc = await db.fetchData(this.config);
-    this.setState({ loading: false });
-
-    let end = new Date();
-    console.log(
-      "表格",
-      this.config.params.ID,
-      "加载完成，总耗时：",
-      end.getTime() - start.getTime(),
-      "ms"
-    );
-
     const { page, pageSize } = this.state;
     let data = this.dataSrc;
     const { source, timing } = data;
@@ -83,10 +67,13 @@ class Tables extends Component {
       dataSource = db.getPageData({ data: this.dataClone, page, pageSize });
     }
 
-    const columns = db.handleColumns({
-      dataSrc: data,
-      filteredInfo: {}
-    });
+    const columns = db.handleColumns(
+      {
+        dataSrc: data,
+        filteredInfo: {}
+      },
+      this.props.cartLinkMode
+    );
     this.setState({
       columns,
       dataSource
@@ -99,10 +86,10 @@ class Tables extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (R.equals(nextProps.config, this.config)) {
+    if (R.equals(nextProps.dataSrc, this.dataSrc)) {
       return;
     }
-    this.config = nextProps.config;
+    this.dataSrc = nextProps.dataSrc;
     this.init();
   }
 
@@ -197,10 +184,9 @@ class Tables extends Component {
   getExportConfig = () => {
     const { columns } = this.state;
     const { title } = this.dataSrc;
-    const dateRange = this.config.params;
 
     const header = R.map(R.prop("title"))(columns);
-    const filename = `${title}(${dateRange.tstart} 至 ${dateRange.tend})`;
+    const filename = `${title}`;
     const keys = header.map((item, i) => "col" + i);
     const body = R.map(R.props(keys))(this.dataClone);
     return {
@@ -251,17 +237,17 @@ class Tables extends Component {
   };
 
   TableTitle = () => {
-    const dateRange = this.config.params;
+    // const dateRange = this.config.params;
     const { title } = this.dataSrc;
     return (
       title && (
         <div className={styles.tips}>
           <div className={styles.title}>{title}</div>
-          {dateRange.tstart && (
+          {/* {dateRange.tstart && (
             <small>
               时间范围 : {dateRange.tstart} 至 {dateRange.tend}
             </small>
-          )}
+          )} */}
         </div>
       )
     );
@@ -272,8 +258,8 @@ class Tables extends Component {
       loading,
       columns,
       dataSource,
-      source,
-      timing,
+      // source,
+      // timing,
       total,
       page,
       pageSize
@@ -288,7 +274,7 @@ class Tables extends Component {
           pagination={false}
           size="medium"
           onChange={this.handleChange}
-          footer={() => `${source} (共耗时${timing})`}
+          // footer={() => `${source} (共耗时${timing})`}
         />
         <Pagination
           className="ant-table-pagination"
@@ -309,7 +295,6 @@ class Tables extends Component {
 
   render() {
     const tBody = this.getTBody();
-
     return (
       <Card
         title={
@@ -325,7 +310,7 @@ class Tables extends Component {
             </div>
           </div>
         }
-        style={{ width: "100%" }}
+        style={{ width: "100%", marginTop: 20 }}
         bodyStyle={{ padding: "0px 0px 12px 0px" }}
         className={styles.exCard}
       >
@@ -336,15 +321,15 @@ class Tables extends Component {
 }
 
 Tables.defaultProps = {
-  config: {
-    url: "",
-    params: {
-      ID: "258",
-      cache: 10,
-      tstart: "",
-      tend: ""
-    }
-  }
+  dataSrc: {
+    data: [],
+    title: "",
+    rows: 0,
+    time: "0ms",
+    header: []
+  },
+  loading: false,
+  cartLinkMode: "search"
 };
 
 export default Tables;

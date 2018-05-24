@@ -9,26 +9,21 @@ const { Header } = Layout;
 function HeaderMenu({ location }) {
   return (
     <Header className={styles.header}>
-      <div className={styles.logo}>大张抽检车号自动分配</div>
+      <div className={styles.logo}>sheet</div>
       <Menu
         selectedKeys={[location.pathname]}
         mode="horizontal"
         theme="dark"
         className={styles.menu}
       >
-        <Menu.Item key="/">
-          <Link to="/">
-            <Icon type="home" />任务发布
+        <Menu.Item key="/table">
+          <Link to="/table">
+            <Icon type="table" />报表
           </Link>
         </Menu.Item>
-        <Menu.Item key="/users">
-          <Link to="/users">
-            <Icon type="bars" />任务领取
-          </Link>
-        </Menu.Item>
-        <Menu.Item key="/report">
-          <Link to="/report">
-            <Icon type="frown-circle" />数据报表
+        <Menu.Item key="/chart">
+          <Link to="/chart">
+            <Icon type="frown-circle" />图表
           </Link>
         </Menu.Item>
       </Menu>
