@@ -198,7 +198,6 @@ class Tables extends Component {
 
   downloadExcel = () => {
     const config = this.getExportConfig();
-    config.filename = config.filename + ".xlsx";
     const xlsx = new Excel(config);
     xlsx.save();
   };
@@ -207,6 +206,9 @@ class Tables extends Component {
     const config = this.getExportConfig();
     config.download = "download";
     config.title = this.dataSrc.title;
+    // 自动调整文档方向
+    config.orientation =
+      this.dataSrc.header.length > 7 ? "landscape" : "portrait";
     pdf(config);
   };
 
@@ -237,33 +239,21 @@ class Tables extends Component {
   };
 
   TableTitle = () => {
-    // const dateRange = this.config.params;
     const { title } = this.dataSrc;
     return (
       title && (
         <div className={styles.tips}>
           <div className={styles.title}>{title}</div>
-          {/* {dateRange.tstart && (
-            <small>
-              时间范围 : {dateRange.tstart} 至 {dateRange.tend}
-            </small>
-          )} */}
+          {this.props.subTitle}
         </div>
       )
     );
   };
 
   getTBody = () => {
-    const {
-      loading,
-      columns,
-      dataSource,
-      // source,
-      // timing,
-      total,
-      page,
-      pageSize
-    } = this.state;
+    const { loading, columns, dataSource, total, page, pageSize } = this.state;
+    console.log(this.dataSrc);
+    const { source, time } = this.dataSrc;
     return (
       <>
         <Table
@@ -274,7 +264,7 @@ class Tables extends Component {
           pagination={false}
           size="medium"
           onChange={this.handleChange}
-          // footer={() => `${source} (共耗时${timing})`}
+          footer={() => `${source} (共耗时${time})`}
         />
         <Pagination
           className="ant-table-pagination"

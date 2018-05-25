@@ -14,7 +14,7 @@ function Tables({ dispatch, dateRange, loading, dataSource }) {
   const onDateChange = async (dates, dateStrings) => {
     await dispatch({
       type: "table/setDateRange",
-      payload: { dateStrings }
+      payload: { dateRange: dateStrings }
     });
     await dispatch({
       type: "table/updateParams"
@@ -26,7 +26,7 @@ function Tables({ dispatch, dateRange, loading, dataSource }) {
 
   const DateRangePicker = () => (
     <div>
-      {/* <label className={styles.labelDesc}>起始时间:</label> */}
+      <label className={styles.labelDesc}>起始时间:</label>
       <RangePicker
         ranges={dateRanges}
         format="YYYYMMDD"
@@ -47,7 +47,14 @@ function Tables({ dispatch, dateRange, loading, dataSource }) {
       </div>
       {dataSource.map((dataSrc, key) => (
         <div key={key} className={key ? styles.tableContainer : null}>
-          <Table dataSrc={dataSrc} />
+          <Table
+            dataSrc={dataSrc}
+            subTitle={
+              <small>
+                时间范围 : {dateRange[0]} 至 {dateRange[1]}
+              </small>
+            }
+          />
         </div>
       ))}
     </>
@@ -56,6 +63,7 @@ function Tables({ dispatch, dateRange, loading, dataSource }) {
 
 function mapStateToProps(state) {
   return {
+    loading: state.loading.models.table,
     ...state.table
   };
 }

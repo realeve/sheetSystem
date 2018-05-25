@@ -33,16 +33,18 @@ export default {
         params
       }
     }) {
-      if (state.tid.length) {
-        tid = state.tid;
-        params = state.params;
+      if (state.tid.length === 0) {
+        return {
+          ...state,
+          dateRange,
+          tid,
+          params
+        };
       }
 
       return {
         ...state,
-        dateRange,
-        tid,
-        params
+        dateRange
       };
     },
     saveData(state, {
@@ -99,11 +101,10 @@ export default {
       put,
       select
     }) {
-      const store = yield select(state => state[namespace]);
-      let {
+      const {
         axiosOptions,
         dataSource
-      } = store;
+      } = yield select(state => state[namespace]);
 
       for (let idx = 0; idx < axiosOptions.length; idx++) {
         dataSource[idx] = yield call(db.fetchData, axiosOptions[idx])
@@ -122,6 +123,7 @@ export default {
       dispatch,
       history
     }) {
+      // ?id=98/8832903756&id=/131/4172bb514d&id=87/a7835c9ebc
       return history.listen(({
         pathname,
         query
@@ -133,17 +135,6 @@ export default {
         Reflect.deleteProperty(params, 'id');
 
         let needRefresh = id && id.length
-
-        // 初始化数据
-        if (needRefresh) {
-          let dataSource = id.map(() => [])
-          dispatch({
-            type: "saveData",
-            payload: {
-              dataSource
-            }
-          });
-        }
 
         const match = pathToRegexp("/").exec(pathname);
         if (match) {
