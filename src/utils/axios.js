@@ -1,7 +1,7 @@
 import http from "axios";
 import qs from "qs";
 
-export let DEV = false;
+export let DEV = true;
 
 export let host = DEV ?
   "http://localhost:90/api/" :

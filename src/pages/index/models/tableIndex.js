@@ -1,6 +1,7 @@
 import pathToRegexp from "path-to-regexp";
 import * as db from "../services/table";
 import dateRanges from "../../../utils/ranges";
+import qs from 'qs';
 const R = require('ramda');
 
 const namespace = "table";
@@ -126,13 +127,19 @@ export default {
       // ?id=98/8832903756&id=/131/4172bb514d&id=87/a7835c9ebc
       return history.listen(({
         pathname,
-        query
+        hash
       }) => {
-        const {
+        let queryStr = hash.slice(1);
+        let query = qs.parse(queryStr);
+        let {
           id
         } = query;
         let params = R.clone(query);
         Reflect.deleteProperty(params, 'id');
+
+        if ('String' === R.type(id)) {
+          id = [id]
+        }
 
         let needRefresh = id && id.length
 

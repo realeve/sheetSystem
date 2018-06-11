@@ -19,6 +19,7 @@
     "path-to-regexp": "^2.2.0",
     "pdfmake": "^0.1.36",
     "prop-types": "^15.6.1",
+    "qs": "^6.5.2",
     "ramda": "^0.25.0",
     "umi": "^1.0.0-0",
     "umi-plugin-dva": "^0.1.5"
