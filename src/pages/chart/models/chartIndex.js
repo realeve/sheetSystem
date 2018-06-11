@@ -12,25 +12,33 @@ export default {
     query: {}
   },
   reducers: {
-    setTid(state, { payload: tid }) {
+    setTid(state, {
+      payload: tid
+    }) {
       return {
         ...state,
         tid
       };
     },
-    setDateRange(state, { payload: dateRange }) {
+    setDateRange(state, {
+      payload: dateRange
+    }) {
       return {
         ...state,
         dateRange
       };
     },
-    setConfig(state, { payload: config }) {
+    setConfig(state, {
+      payload: config
+    }) {
       return {
         ...state,
         config
       };
     },
-    setQuery(state, { payload: query }) {
+    setQuery(state, {
+      payload: query
+    }) {
       return {
         ...state,
         query
@@ -38,34 +46,58 @@ export default {
     }
   },
   effects: {
-    *updateDateRange({ payload: dateRange }, { put }) {
+    * updateDateRange({
+      payload: dateRange
+    }, {
+      put
+    }) {
       yield put({
         type: "setDateRange",
         payload: dateRange
       });
     },
-    *updateTid({ payload: tid }, { put }) {
+    * updateTid({
+      payload: tid
+    }, {
+      put
+    }) {
       yield put({
         type: "setTid",
         payload: tid
       });
     },
-    *updateQuery({ payload: query }, { put }) {
+    * updateQuery({
+      payload: query
+    }, {
+      put
+    }) {
       yield put({
         type: "setQuery",
         payload: query
       });
     },
-    *updateConfig({ payload: { tstart, tend } }, { put, call, select }) {
-      const { tid, query } = yield select(state => state.chartIndex);
+    * updateConfig({
+      payload: {
+        tstart,
+        tend
+      }
+    }, {
+      put,
+      call,
+      select
+    }) {
+      const {
+        tid,
+        query
+      } = yield select(state => state.chartIndex);
       const config = tid.map(
         item =>
-          db.getQueryConfig({
-            ...query,
-            tid: item,
-            tstart,
-            tend
-          }).payload
+        db.getQueryConfig({
+          ...query,
+          tid: item,
+          tstart,
+          tend
+        }).payload
       );
       yield put({
         type: "setConfig",
@@ -74,8 +106,14 @@ export default {
     }
   },
   subscriptions: {
-    setup({ dispatch, history }) {
-      return history.listen(({ pathname, query }) => {
+    setup({
+      dispatch,
+      history
+    }) {
+      return history.listen(({
+        pathname,
+        query
+      }) => {
         const match = pathToRegexp("/chart/:tid").exec(pathname);
         if (match) {
           const [tstart, tend] = dateRanges["去年同期"];

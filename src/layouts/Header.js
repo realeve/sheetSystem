@@ -9,7 +9,7 @@ const { Header } = Layout;
 function HeaderMenu({ location }) {
   return (
     <Header className={styles.header}>
-      <div className={styles.logo}>sheet</div>
+      <div className={styles.logo}>报表系统</div>
       <Menu
         selectedKeys={[location.pathname]}
         mode="horizontal"
@@ -23,7 +23,7 @@ function HeaderMenu({ location }) {
         </Menu.Item>
         <Menu.Item key="/chart">
           <Link to="/chart">
-            <Icon type="frown-circle" />图表
+            <Icon type="area-chart" />图表
           </Link>
         </Menu.Item>
       </Menu>
