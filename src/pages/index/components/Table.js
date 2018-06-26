@@ -85,7 +85,8 @@ class Tables extends Component {
     this.init();
   }
 
-  componentWillReceiveProps(nextProps) {
+  // 待调整，生产周期命名函数
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (R.equals(nextProps.dataSrc, this.dataSrc)) {
       return;
     }
@@ -106,7 +107,7 @@ class Tables extends Component {
   // 分页数量调整
   onShowSizeChange = async (current, nextPageSize) => {
     let newPage = Math.max(
-      Math.floor(this.state.pageSize * current / nextPageSize),
+      Math.floor((this.state.pageSize * current) / nextPageSize),
       1
     );
     await this.setState({
@@ -212,85 +213,92 @@ class Tables extends Component {
     pdf(config);
   };
 
-  Action = () => {
-    const menu = (
-      <Menu>
-        <Menu.Item>
-          <a rel="noopener noreferrer" onClick={this.downloadExcel}>
-            <Icon type="file-excel" />
-            excel
-          </a>
-        </Menu.Item>
-        <Menu.Item>
-          <a rel="noopener noreferrer" onClick={this.downloadPdf}>
-            <Icon type="file-pdf" />
-            PDF
-          </a>
-        </Menu.Item>
-      </Menu>
-    );
-    return (
-      <Dropdown overlay={menu}>
-        <Button style={{ marginLeft: 0 }}>
-          下载 <Icon type="down" />
-        </Button>
-      </Dropdown>
-    );
-  };
-
-  TableTitle = () => {
-    const { title } = this.dataSrc;
-    return (
-      title && (
-        <div className={styles.tips}>
-          <div className={styles.title}>{title}</div>
-          {this.props.subTitle}
-        </div>
-      )
-    );
-  };
-
-  getTBody = () => {
-    const { loading, columns, dataSource, total, page, pageSize } = this.state;
-    console.log(this.dataSrc);
-    const { source, time } = this.dataSrc;
-    return (
-      <>
-        <Table
-          loading={loading}
-          columns={columns}
-          dataSource={dataSource}
-          rowKey="key"
-          pagination={false}
-          size="medium"
-          onChange={this.handleChange}
-          footer={() => `${source} (共耗时${time})`}
-        />
-        <Pagination
-          className="ant-table-pagination"
-          showTotal={(total, range) =>
-            total ? `${range[0]}-${range[1]} 共 ${total} 条数据` : ""
-          }
-          showSizeChanger
-          onShowSizeChange={this.onShowSizeChange}
-          total={total}
-          current={page}
-          pageSize={pageSize}
-          onChange={this.refreshByPage}
-          pageSizeOptions={["5", "10", "15", "20", "30", "40", "50", "100"]}
-        />
-      </>
-    );
-  };
-
   render() {
-    const tBody = this.getTBody();
+    const TableBody = () => {
+      const {
+        loading,
+        columns,
+        dataSource,
+        total,
+        page,
+        pageSize
+      } = this.state;
+      // console.log(this.dataSrc);
+      const { source, time } = this.dataSrc;
+
+      return (
+        <>
+          <Table
+            loading={loading}
+            columns={columns}
+            dataSource={dataSource}
+            rowKey="key"
+            pagination={false}
+            size="medium"
+            onChange={this.handleChange}
+            footer={() => `${source} (共耗时${time})`}
+          />
+          <Pagination
+            className="ant-table-pagination"
+            showTotal={(total, range) =>
+              total ? `${range[0]}-${range[1]} 共 ${total} 条数据` : ""
+            }
+            showSizeChanger
+            onShowSizeChange={this.onShowSizeChange}
+            total={total}
+            current={page}
+            pageSize={pageSize}
+            onChange={this.refreshByPage}
+            pageSizeOptions={["5", "10", "15", "20", "30", "40", "50", "100"]}
+          />
+        </>
+      );
+    };
+
+    const Action = () => {
+      const menu = (
+        <Menu>
+          <Menu.Item>
+            <a rel="noopener noreferrer" onClick={this.downloadExcel}>
+              <Icon type="file-excel" />
+              excel
+            </a>
+          </Menu.Item>
+          <Menu.Item>
+            <a rel="noopener noreferrer" onClick={this.downloadPdf}>
+              <Icon type="file-pdf" />
+              PDF
+            </a>
+          </Menu.Item>
+        </Menu>
+      );
+      return (
+        <Dropdown overlay={menu}>
+          <Button style={{ marginLeft: 0 }}>
+            下载 <Icon type="down" />
+          </Button>
+        </Dropdown>
+      );
+    };
+
+    const TableTitle = () => {
+      const { title } = this.dataSrc;
+      return (
+        title && (
+          <div className={styles.tips}>
+            <div className={styles.title}>{title}</div>
+            {this.props.subTitle}
+          </div>
+        )
+      );
+    };
+
     return (
       <Card
         title={
           <div className={styles.header}>
-            {this.Action()}
-            {this.TableTitle()}
+            <Action />
+            <TableTitle />
             <div className={styles.search}>
               <Search
                 placeholder="输入任意值过滤数据"
@@ -304,7 +312,7 @@ class Tables extends Component {
         bodyStyle={{ padding: "0px 0px 12px 0px" }}
         className={styles.exCard}
       >
-        {tBody}
+        <TableBody />
       </Card>
     );
   }

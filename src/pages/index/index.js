@@ -13,7 +13,7 @@ const RangePicker = DatePicker.RangePicker;
 function Tables({ dispatch, dateRange, loading, dataSource }) {
   const onDateChange = async (dates, dateStrings) => {
     await dispatch({
-      type: "table/setDateRange",
+      type: "table/setStore",
       payload: { dateRange: dateStrings }
     });
     await dispatch({

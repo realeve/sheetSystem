@@ -14,8 +14,8 @@ function Charts({ dispatch, dateRange, config, loading }) {
   const onDateChange = async (dates, dateStrings) => {
     const [tstart, tend] = dateStrings;
     await dispatch({
-      type: "chartIndex/setDateRange",
-      payload: dateStrings
+      type: "chartIndex/setStore",
+      payload: { dateRange: dateStrings }
     });
 
     await dispatch({

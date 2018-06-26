@@ -15,65 +15,72 @@ export default {
     axiosOptions: []
   },
   reducers: {
-    updateTid(state, {
-      payload: {
-        tid,
-        params
-      }
+    setStore(state, {
+      payload
     }) {
-      return {
-        ...state,
-        tid,
-        params
+      return { ...state,
+        ...payload
       };
     },
-    setDateRange(state, {
-      payload: {
-        dateRange,
-        tid,
-        params
-      }
-    }) {
-      if (state.tid.length === 0) {
-        return {
-          ...state,
-          dateRange,
-          tid,
-          params
-        };
-      }
+    // updateTid(state, {
+    //   payload: {
+    //     tid,
+    //     params
+    //   }
+    // }) {
+    //   return {
+    //     ...state,
+    //     tid,
+    //     params
+    //   };
+    // },
+    // setDateRange(state, {
+    //   payload: {
+    //     dateRange,
+    //     tid,
+    //     params
+    //   }
+    // }) {
+    //   if (state.tid.length === 0) {
+    //     return {
+    //       ...state,
+    //       dateRange,
+    //       tid,
+    //       params
+    //     };
+    //   }
 
-      return {
-        ...state,
-        dateRange
-      };
-    },
-    saveData(state, {
-      payload: {
-        dataSource
-      }
-    }) {
-      return {
-        ...state,
-        dataSource
-      }
-    },
-    setParams(state, {
-      payload: params
-    }) {
-      return {
-        ...state,
-        params
-      }
-    },
-    setAxiosOptions(state, {
-      payload: axiosOptions
-    }) {
-      return {
-        ...state,
-        axiosOptions,
-      }
-    }
+    //   return {
+    //     ...state,
+    //     dateRange
+    //   };
+    // },
+    // saveData(state, {
+    //   payload: {
+    //     dataSource
+    //   }
+    // }) {
+    //   return {
+    //     ...state,
+    //     dataSource
+    //   }
+    // },
+    // setParams(state, {
+    //   payload: params
+    // }) {
+    //   return {
+    //     ...state,
+    //     params
+    //   }
+    // },
+    // setAxiosOptions(state, {
+    //   payload: axiosOptions
+    // }) {
+    //   return {
+    //     ...state,
+    //     axiosOptions,
+    //   }
+    // }
   },
   effects: {
     * updateParams(payload, {
@@ -93,7 +100,7 @@ export default {
         dateRange
       });
       yield put({
-        type: 'setAxiosOptions',
+        type: 'setStore',
         payload: param
       })
     },
@@ -112,7 +119,7 @@ export default {
       }
 
       yield put({
-        type: "saveData",
+        type: "setStore",
         payload: {
           dataSource
         }
@@ -148,7 +155,7 @@ export default {
           const [tstart, tend] = dateRanges["去年同期"];
           const [ts, te] = [tstart.format("YYYYMMDD"), tend.format("YYYYMMDD")];
           dispatch({
-            type: "setDateRange",
+            type: "setStore",
             payload: {
               dateRange: [ts, te],
               tid: id,

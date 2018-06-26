@@ -12,70 +12,77 @@ export default {
     query: {}
   },
   reducers: {
-    setTid(state, {
-      payload: tid
+    setStore(state, {
+      payload
     }) {
-      return {
-        ...state,
-        tid
+      return { ...state,
+        ...payload
       };
     },
-    setDateRange(state, {
-      payload: dateRange
-    }) {
-      return {
-        ...state,
-        dateRange
-      };
-    },
-    setConfig(state, {
-      payload: config
-    }) {
-      return {
-        ...state,
-        config
-      };
-    },
-    setQuery(state, {
-      payload: query
-    }) {
-      return {
-        ...state,
-        query
-      };
-    }
+    // setTid(state, {
+    //   payload: tid
+    // }) {
+    //   return {
+    //     ...state,
+    //     tid
+    //   };
+    // },
+    // setDateRange(state, {
+    //   payload: dateRange
+    // }) {
+    //   return {
+    //     ...state,
+    //     dateRange
+    //   };
+    // },
+    // setConfig(state, {
+    //   payload: config
+    // }) {
+    //   return {
+    //     ...state,
+    //     config
+    //   };
+    // },
+    // setQuery(state, {
+    //   payload: query
+    // }) {
+    //   return {
+    //     ...state,
+    //     query
+    //   };
+    // }
   },
   effects: {
-    * updateDateRange({
-      payload: dateRange
-    }, {
-      put
-    }) {
-      yield put({
-        type: "setDateRange",
-        payload: dateRange
-      });
-    },
-    * updateTid({
-      payload: tid
-    }, {
-      put
-    }) {
-      yield put({
-        type: "setTid",
-        payload: tid
-      });
-    },
-    * updateQuery({
-      payload: query
-    }, {
-      put
-    }) {
-      yield put({
-        type: "setQuery",
-        payload: query
-      });
-    },
+    // * updateDateRange({
+    //   payload: dateRange
+    // }, {
+    //   put
+    // }) {
+    //   yield put({
+    //     type: "setDateRange",
+    //     payload: dateRange
+    //   });
+    // },
+    // * updateTid({
+    //   payload: tid
+    // }, {
+    //   put
+    // }) {
+    //   yield put({
+    //     type: "setTid",
+    //     payload: tid
+    //   });
+    // },
+    // * updateQuery({
+    //   payload: query
+    // }, {
+    //   put
+    // }) {
+    //   yield put({
+    //     type: "setQuery",
+    //     payload: query
+    //   });
+    // },
     * updateConfig({
       payload: {
         tstart,
@@ -100,8 +107,10 @@ export default {
         }).payload
       );
       yield put({
-        type: "setConfig",
-        payload: config
+        type: "setStore",
+        payload: {
+          config
+        }
       });
     }
   },
@@ -118,21 +127,14 @@ export default {
         if (match) {
           const [tstart, tend] = dateRanges["去年同期"];
           const [ts, te] = [tstart.format("YYYYMMDD"), tend.format("YYYYMMDD")];
-          dispatch({
-            type: "setDateRange",
-            payload: [ts, te]
-          });
-
           const tid = match[1].split(",");
-
           dispatch({
-            type: "updateTid",
-            payload: tid
-          });
-
-          dispatch({
-            type: "updateQuery",
-            payload: query
+            type: "setStore",
+            payload: {
+              dateRange: [ts, te],
+              tid,
+              query,
+            }
           });
 
           dispatch({
