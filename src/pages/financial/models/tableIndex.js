@@ -30,9 +30,10 @@ export default {
         curId,
         latestId
       } = yield call(db.getPeriodDate, dateRange[1]);
-
-      const dataSource = yield call(db.getPeriodInv, curId, latestId)
-
+      let inv = yield call(db.getPeriodInv, curId, latestId)
+      let pay = yield call(db.getPeriodPay, curId);
+      let rec = yield call(db.getPeriodRec, curId);
+      const dataSource = [];
       yield put({
         type: "setStore",
         payload: {

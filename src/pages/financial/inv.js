@@ -12,12 +12,6 @@ const MonthPicker = DatePicker.MonthPicker;
 
 function Tables({ dispatch, dateRange, loading, dataSource }) {
   const onDateChange = async (dates, dateStrings) => {
-    let monthB = moment(dateStrings, 'YYYY-MM').format("MM-YY");
-    let monthA = moment(dateStrings, 'YYYY-MM').add(-1, "months").format("MM-YY");
-    console.log(monthA, monthB);
-    let periodA = await getPeriodid(monthB);
-    let periodB = await getPeriodid(monthB);
-    console.log(periodA, periodB);
     await dispatch({
       type: "financial/setStore",
       payload: { dateRange: [dateStrings, dateStrings] }
