@@ -1,4 +1,3 @@
-import pathToRegexp from "path-to-regexp";
 import * as db from "../services/db";
 import dateRanges from "../../../utils/ranges";
 
@@ -19,7 +18,7 @@ export default {
     }
   },
   effects: {
-    * refreshData(payload, {
+    * refreshInvData(payload, {
       call,
       put,
       select
@@ -27,20 +26,19 @@ export default {
       const {
         dateRange
       } = yield select(state => state[namespace]);
-
       const {
         curId,
         latestId
       } = yield call(db.getPeriodDate, dateRange[1]);
+
       const dataSource = yield call(db.getPeriodInv, curId, latestId)
-      console.log(dataSource)
-      return;
-      // yield put({
-      //   type: "setStore",
-      //   payload: {
-      //     dataSource
-      //   }
-      // });
+
+      yield put({
+        type: "setStore",
+        payload: {
+          dataSource
+        }
+      });
     }
   },
   subscriptions: {
@@ -49,31 +47,32 @@ export default {
       history
     }) {
       return history.listen(({
-        pathname,
-        hash
+        pathname
       }) => {
-        const match = pathToRegexp("/" + namespace).exec(pathname);
-        if (match) {
-          const [tstart, tend] = dateRanges["过去一月"];
-          const [ts, te] = [tstart.format("YYYY-MM-DD"), tend.format("YYYY-MM-DD")];
-          dispatch({
-            type: "setStore",
-            payload: {
-              dateRange: [ts, te]
-            }
-          });
+        const [tstart, tend] = dateRanges["过去一月"];
+        const [ts, te] = [tstart.format("YYYY-MM-DD"), tend.format("YYYY-MM-DD")];
+        dispatch({
+          type: "setStore",
+          payload: {
+            dateRange: [ts, te]
+          }
+        });
 
-          dispatch({
-            type: "refreshData"
-          });
-
-          // if (needRefresh) {
-          //   dispatch({
-          //     type: "refreshData"
-          //   });
-          // }
-
+        const match = pathname.replace("/" + namespace, '');
+        switch (match) {
+          case '/inv':
+            dispatch({
+              type: "refreshInvData"
+            });
+            break;
+          case '/pay':
+            break;
+          case '/rec':
+            break;
+          default:
+            break;
         }
+
       });
     }
   }

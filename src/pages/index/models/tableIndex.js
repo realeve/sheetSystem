@@ -21,66 +21,7 @@ export default {
       return { ...state,
         ...payload
       };
-    },
-    // updateTid(state, {
-    //   payload: {
-    //     tid,
-    //     params
-    //   }
-    // }) {
-    //   return {
-    //     ...state,
-    //     tid,
-    //     params
-    //   };
-    // },
-    // setDateRange(state, {
-    //   payload: {
-    //     dateRange,
-    //     tid,
-    //     params
-    //   }
-    // }) {
-    //   if (state.tid.length === 0) {
-    //     return {
-    //       ...state,
-    //       dateRange,
-    //       tid,
-    //       params
-    //     };
-    //   }
-
-    //   return {
-    //     ...state,
-    //     dateRange
-    //   };
-    // },
-    // saveData(state, {
-    //   payload: {
-    //     dataSource
-    //   }
-    // }) {
-    //   return {
-    //     ...state,
-    //     dataSource
-    //   }
-    // },
-    // setParams(state, {
-    //   payload: params
-    // }) {
-    //   return {
-    //     ...state,
-    //     params
-    //   }
-    // },
-    // setAxiosOptions(state, {
-    //   payload: axiosOptions
-    // }) {
-    //   return {
-    //     ...state,
-    //     axiosOptions,
-    //   }
-    // }
+    }
   },
   effects: {
     * updateParams(payload, {
