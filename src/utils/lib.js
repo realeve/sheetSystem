@@ -203,7 +203,7 @@ export let dataFile2URI = async (file, callback) => {
   return reader;
 };
 
-const LOCAL = "http://localhost:8080/data/";
+const LOCAL = "http://localhost:8000/data/";
 const SERV = "http://10.8.1.25:100/api/";
 export const API = {
   PERIOD_MAXID: DEV ? LOCAL + "bc2e7d3404_periodid.json" : SERV + "150/bc2e7d3404.html",
