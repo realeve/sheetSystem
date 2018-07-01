@@ -5,7 +5,10 @@ import { DatePicker } from "antd";
 import styles from "./index.less";
 import moment from "moment";
 import "moment/locale/zh-cn";
+import { getPeriodid } from "./services/db";
 moment.locale("zh-cn");
+
+const MonthPicker = DatePicker.MonthPicker;
 
 function Tables({ dispatch, dateRange, loading, dataSource }) {
   const onDateChange = async (dates, dateStrings) => {
@@ -19,13 +22,19 @@ function Tables({ dispatch, dateRange, loading, dataSource }) {
     });
   };
 
+  const disabledDate = (current) => {
+    // Can not select days before today and today
+    return current && current >= moment().endOf('day');
+  }
+
   const DateRangePicker = () => (
     <div>
       <label className={styles.labelDesc}>查询期间:</label>
-      <DatePicker
+      <MonthPicker
         allowClear={false}
-        format="YYYY-MM-DD"
+        format="YYYY-MM"
         onChange={onDateChange}
+        disabledDate={disabledDate}
         defaultValue={moment(dateRange[1])}
       />
     </div>

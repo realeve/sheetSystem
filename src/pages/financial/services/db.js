@@ -28,10 +28,11 @@ export const getPeriodid = async periodName => {
  * @param {当前日期} dateName
  */
 export const getPeriodDate = async curDay => {
-  const latestDay = moment(curDay)
+  const curMonth = moment(curDay, "YYYY-MM").format("MM-YY");
+  const latestDay = moment(curDay, "YYYY-MM")
     .subtract(1, "month")
-    .format("YYYY-MM-DD");
-  const curId = await getPeriodid(curDay);
+    .format("MM-YY");
+  const curId = await getPeriodid(curMonth);
   const latestId = await getPeriodid(latestDay);
   return {
     curId,
