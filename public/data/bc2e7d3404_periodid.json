@@ -1,0 +1,10 @@
+{
+  "data": [{
+    "PERIODID": "3829"
+  }],
+  "title": "按期间名称查询期间最大事务处理ID",
+  "rows": 1,
+  "time": "66.211ms",
+  "header": ["PERIODID"],
+  "source": "数据来源：ERP系统"
+}

@@ -1,7 +1,8 @@
 import moment from "moment";
 import {
   host,
-  uploadHost
+  uploadHost,
+  DEV
 } from "./axios";
 import http from "axios";
 export const searchUrl = "http://10.8.2.133/search#";
@@ -200,4 +201,13 @@ export let dataFile2URI = async (file, callback) => {
   };
   reader.readAsDataURL(file);
   return reader;
+};
+
+const LOCAL = "http://localhost:8080/data/";
+const SERV = "http://10.8.1.25:100/api/";
+export const API = {
+  PERIOD_MAXID: DEV ? LOCAL + "bc2e7d3404_periodid.json" : SERV + "150/bc2e7d3404.html",
+  IF_INV: DEV ? LOCAL + "f0d7f4eab9_inv.json" : SERV + "151/f0d7f4eab9.html",
+  IF_PAY: DEV ? LOCAL + "16a5f99c46_pay.json" : SERV + "152/9b089d2e3c.html",
+  IF_REC: DEV ? LOCAL + "9b089d2e3c_rec.json" : SERV + "153/16a5f99c46.html"
 };
