@@ -17,18 +17,47 @@
 
 @table-border-color: #555;
 table {
-  border: solid 2px @table-border-color!important;
+  border-top: 2px solid @table-border-color!important;
+  border-bottom: 2px solid @table-border-color!important;
   border-radius: 0 !important;
   border-collapse: collapse !important;
+
   td,
   th {
     border: solid 1px @table-border-color!important;
   }
+
   th:last-child {
     border-top-right-radius: 0 !important;
   }
+
   th:first-child {
     border-top-left-radius: 0 !important;
+  }
+
+  tr {
+    td:first-child,
+    th:first-child {
+      border-left: none !important;
+    }
+    td:last-child,
+    th:last-child {
+      border-right: none !important;
+    }
+  }
+  thead {
+    tr {
+      th {
+        font-weight: bold !important;
+      }
+    }
+  }
+  tbody {
+    tr:first-child {
+      td {
+        border-top: 2px solid @table-border-color !important;
+      }
+    }
   }
 }
 
