@@ -18,7 +18,7 @@ class Index extends Component {
   }
 
   // 组件加载前更新菜单ID
-  componentWillMount() {
+  componentDidMount() {
     const { pathname } = this.props.location;
     let curPageName;
     switch (pathname) {

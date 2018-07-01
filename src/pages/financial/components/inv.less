@@ -1,0 +1,73 @@
+.header {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 0 10px 0;
+  .labelDesc {
+    padding-right: 10px;
+  }
+  .dateRange {
+    display: flex;
+    justify-content: flex-end;
+    flex-direction: column;
+    :global(.ant-calendar-picker) {
+      width: 220px;
+    }
+  }
+}
+
+@table-border-color: #555;
+table {
+  border: solid 2px @table-border-color!important;
+  border-radius: 0 !important;
+  border-collapse: collapse !important;
+  td,
+  th {
+    border: solid 1px @table-border-color!important;
+  }
+  th:last-child {
+    border-top-right-radius: 0 !important;
+  }
+  th:first-child {
+    border-top-left-radius: 0 !important;
+  }
+}
+
+.pdfContainer {
+  margin-top: 40px;
+  .head {
+    width: 100%;
+    h2 {
+      text-align: center;
+    }
+    span {
+      font-weight: bold;
+    }
+    p {
+      margin-bottom: 0.5em;
+    }
+  }
+  .action {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+  }
+}
+
+@media print {
+  .header {
+    display: none;
+  }
+  .pdfContainer {
+    margin-top: 0px;
+    font-size: 10.5pt;
+    .head {
+      p {
+        margin-bottom: 5px;
+      }
+      margin-bottom: 20px;
+    }
+    .action {
+      display: none;
+    }
+  }
+}

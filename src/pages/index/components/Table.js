@@ -86,7 +86,8 @@ class Tables extends Component {
   }
 
   // 待调整，生产周期命名函数
-  UNSAFE_componentWillReceiveProps(nextProps) {
+  // UNSAFE_componentWillReceiveProps
+  getDerivedStateFromProps(nextProps) {
     if (R.equals(nextProps.dataSrc, this.dataSrc)) {
       return;
     }

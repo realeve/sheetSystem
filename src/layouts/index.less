@@ -20,3 +20,23 @@
     text-align: center;
   }
 }
+
+@media print {
+  .main {
+    background: #fff;
+    .container {
+      padding: 0;
+      .breadCrumb {
+        display: none;
+      }
+      .content {
+        min-height: 180px;
+      }
+    }
+    .footer {
+      display: none;
+      padding: 0;
+      margin: 0;
+    }
+  }
+}
