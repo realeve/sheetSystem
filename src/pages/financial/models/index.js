@@ -65,6 +65,9 @@ export default {
       return history.listen(({
         pathname
       }) => {
+        if (!pathname.includes(namespace)) {
+          return;
+        }
         const [tstart, tend] = dateRanges["过去一月"];
         const [ts, te] = [tstart.format("YYYY-MM-DD"), tend.format("YYYY-MM-DD")];
 

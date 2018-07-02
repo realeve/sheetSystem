@@ -37,14 +37,17 @@ export default {
       if (R.isNil(tid)) {
         return;
       }
-      let param = yield call(db.handleParams, {
+      let axiosOptions = yield call(db.handleParams, {
         params,
         tid,
         dateRange
       });
+
       yield put({
         type: 'setStore',
-        payload: param
+        payload: {
+          axiosOptions
+        }
       })
     },
     * refreshData(payload, {
@@ -74,7 +77,7 @@ export default {
       dispatch,
       history
     }) {
-      // ?id=98/8832903756&id=/131/4172bb514d&id=87/a7835c9ebc
+      // /table#id=98/8832903756&id=87/a7835c9ebc
       return history.listen(({
         pathname,
         hash
@@ -94,28 +97,30 @@ export default {
         let needRefresh = id && id.length
 
         const match = pathToRegexp("/" + namespace).exec(pathname);
-        if (match) {
-          const [tstart, tend] = dateRanges["去年同期"];
-          const [ts, te] = [tstart.format("YYYYMMDD"), tend.format("YYYYMMDD")];
-          dispatch({
-            type: "setStore",
-            payload: {
-              dateRange: [ts, te],
-              tid: id,
-              params
-            }
-          });
 
-          dispatch({
-            type: 'updateParams'
-          })
+        if (!match) {
+          return;
+        }
 
-          if (needRefresh) {
-            dispatch({
-              type: "refreshData"
-            });
+        const [tstart, tend] = dateRanges["过去一月"];
+        const [ts, te] = [tstart.format("YYYYMMDD"), tend.format("YYYYMMDD")];
+        dispatch({
+          type: "setStore",
+          payload: {
+            dateRange: [ts, te],
+            tid: id,
+            params
           }
+        });
 
+        dispatch({
+          type: 'updateParams'
+        })
+
+        if (needRefresh) {
+          dispatch({
+            type: "refreshData"
+          });
         }
       });
     }

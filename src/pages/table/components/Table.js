@@ -22,11 +22,11 @@ const Search = Input.Search;
 class Tables extends Component {
   constructor(props) {
     super(props);
-    this.dataSrc = props.dataSrc;
     this.dataClone = [];
     this.dataSearchClone = [];
 
     this.state = {
+      dataSrc: props.dataSrc,
       dataSource: [],
       total: 10,
       page: 1,
@@ -41,12 +41,12 @@ class Tables extends Component {
   }
 
   init = async () => {
-    const { page, pageSize } = this.state;
-    let data = this.dataSrc;
+    const { page, pageSize, dataSrc } = this.state;
+    let data = dataSrc;
     const { source, timing } = data;
 
     this.setState({
-      total: this.dataSrc.rows,
+      total: data.rows,
       source,
       timing
     });
@@ -86,12 +86,13 @@ class Tables extends Component {
   }
 
   // 待调整，生产周期命名函数
-  // UNSAFE_componentWillReceiveProps
-  getDerivedStateFromProps(nextProps) {
-    if (R.equals(nextProps.dataSrc, this.dataSrc)) {
+  componentDidUpdate({ dataSrc }, prevState) {
+    if (R.equals(dataSrc, prevState.dataSrc)) {
       return;
     }
-    this.dataSrc = nextProps.dataSrc;
+    this.setState({
+      dataSrc
+    });
     this.init();
   }
 
@@ -118,8 +119,7 @@ class Tables extends Component {
   };
 
   customFilter = async filteredInfo => {
-    const dataSrc = this.dataSrc;
-    const { columns } = this.state;
+    const { columns, dataSrc } = this.state;
 
     this.dataClone = db.handleFilter({
       data: dataSrc.data,
@@ -185,7 +185,7 @@ class Tables extends Component {
 
   getExportConfig = () => {
     const { columns } = this.state;
-    const { title } = this.dataSrc;
+    const { title } = this.state.dataSrc;
 
     const header = R.map(R.prop("title"))(columns);
     const filename = `${title}`;
@@ -207,10 +207,10 @@ class Tables extends Component {
   downloadPdf = () => {
     const config = this.getExportConfig();
     config.download = "download";
-    config.title = this.dataSrc.title;
+    config.title = this.state.dataSrc.title;
     // 自动调整文档方向
     config.orientation =
-      this.dataSrc.header.length > 7 ? "landscape" : "portrait";
+      this.state.dataSrc.header.length > 7 ? "landscape" : "portrait";
     pdf(config);
   };
 
@@ -224,8 +224,8 @@ class Tables extends Component {
         page,
         pageSize
       } = this.state;
-      // console.log(this.dataSrc);
-      const { source, time } = this.dataSrc;
+
+      const { source, time } = this.state.dataSrc;
 
       return (
         <>
@@ -283,7 +283,7 @@ class Tables extends Component {
     };
 
     const TableTitle = () => {
-      const { title } = this.dataSrc;
+      const { title } = this.state.dataSrc;
       return (
         title && (
           <div className={styles.tips}>

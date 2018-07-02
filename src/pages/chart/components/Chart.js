@@ -55,13 +55,11 @@ class Charts extends Component {
     };
   }
 
-  // 待调整，生产周期命名函数
-  // UNSAFE_componentWillReceiveProps
-  getDerivedStateFromProps(nextProps) {
-    if (R.equals(nextProps.config, this.config)) {
+  componentDidUpdate({ config }) {
+    if (R.equals(config, this.config)) {
       return;
     }
-    this.config = nextProps.config;
+    this.config = config;
     this.init();
   }
 
