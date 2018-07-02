@@ -71,9 +71,6 @@ export default {
           case '/rec':
             break;
           default:
-            dispatch({
-              type: "refreshInvData"
-            });
             break;
         }
 

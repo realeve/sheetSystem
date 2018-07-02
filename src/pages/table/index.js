@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from "dva";
 import Table from "./components/Table";
-import { DatePicker } from "antd";
+import { DatePicker, Card } from "antd";
 import styles from "./index.less";
 import dateRanges from "../../utils/ranges";
 import moment from "moment";
@@ -45,6 +45,7 @@ function Tables({ dispatch, dateRange, loading, dataSource }) {
           <DateRangePicker />
         </div>
       </div>
+      {dataSource.length === 0 && <Card title="加载中" loading={true} />}
       {dataSource.map((dataSrc, key) => (
         <div key={key} className={key ? styles.tableContainer : null}>
           <Table

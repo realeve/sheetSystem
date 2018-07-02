@@ -34,7 +34,9 @@ export default {
         params,
         tid
       } = yield select(state => state[namespace]);
-
+      if (R.isNil(tid)) {
+        return;
+      }
       let param = yield call(db.handleParams, {
         params,
         tid,
@@ -91,7 +93,7 @@ export default {
 
         let needRefresh = id && id.length
 
-        const match = pathToRegexp("/").exec(pathname);
+        const match = pathToRegexp("/" + namespace).exec(pathname);
         if (match) {
           const [tstart, tend] = dateRanges["去年同期"];
           const [ts, te] = [tstart.format("YYYYMMDD"), tend.format("YYYYMMDD")];

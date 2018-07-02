@@ -21,9 +21,9 @@ function Tables({ dispatch, dateRange, loading, dataSource }) {
   const DateRangePicker = () => (
     <div>
       <label className={styles.labelDesc}>查询期间:</label>
-      <DatePicker
+      <DatePicker.MonthPicker
         allowClear={false}
-        format="YYYY-MM-DD"
+        format="YYYY-MM"
         onChange={onDateChange}
         defaultValue={moment(dateRange[1])}
       />

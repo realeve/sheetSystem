@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from "dva";
 import Chart from "./components/Chart";
-import { DatePicker } from "antd";
+import { DatePicker, Card } from "antd";
 import styles from "./index.less";
 import dateRanges from "../../utils/ranges";
 import moment from "moment";
@@ -38,6 +38,9 @@ function Charts({ dispatch, dateRange, config, loading }) {
       />
     </div>
   );
+  if (!config.length) {
+    return <Card title="加载中" loading={true} />;
+  }
   return (
     <>
       <div className={styles.header}>

@@ -16,7 +16,7 @@
 }
 
 @table-border-color: #555;
-table {
+.pdf-table {
   border-top: 2px solid @table-border-color;
   border-bottom: 2px solid @table-border-color;
   border-radius: 0;
@@ -95,6 +95,9 @@ table {
   }
   .action {
     margin-top: 20px;
+  }
+  table {
+    .pdf-table;
   }
 }
 
