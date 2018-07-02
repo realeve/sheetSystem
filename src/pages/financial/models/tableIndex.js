@@ -6,7 +6,8 @@ export default {
   namespace,
   state: {
     dateRange: [],
-    dataSource: []
+    dataSource: [],
+    router: ''
   },
   reducers: {
     setStore(state, {
@@ -18,22 +19,36 @@ export default {
     }
   },
   effects: {
-    * refreshInvData(payload, {
+    * refreshData(payload, {
       call,
       put,
       select
     }) {
       const {
-        dateRange
+        dateRange,
+        router
       } = yield select(state => state[namespace]);
       const {
         curId,
         latestId
       } = yield call(db.getPeriodDate, dateRange[1]);
-      let inv = yield call(db.getPeriodInv, curId, latestId)
-      let pay = yield call(db.getPeriodPay, curId);
-      let rec = yield call(db.getPeriodRec, curId);
-      const dataSource = [];
+
+      // 根据路由调整数据
+      let dataSource = [];
+      switch (router) {
+        case '/inv':
+          dataSource = yield call(db.getPeriodInv, curId, latestId);
+          break;
+        case '/pay':
+          dataSource = yield call(db.getPeriodPay, curId);
+          break;
+        case '/rec':
+          dataSource = yield call(db.getPeriodRec, curId);
+          break;
+        default:
+          break;
+      }
+
       yield put({
         type: "setStore",
         payload: {
@@ -52,27 +67,20 @@ export default {
       }) => {
         const [tstart, tend] = dateRanges["过去一月"];
         const [ts, te] = [tstart.format("YYYY-MM-DD"), tend.format("YYYY-MM-DD")];
+
+        const router = pathname.replace("/" + namespace, '');
+
         dispatch({
           type: "setStore",
           payload: {
-            dateRange: [ts, te]
+            dateRange: [ts, te],
+            router
           }
         });
 
-        const match = pathname.replace("/" + namespace, '');
-        switch (match) {
-          case '/inv':
-            dispatch({
-              type: "refreshInvData"
-            });
-            break;
-          case '/pay':
-            break;
-          case '/rec':
-            break;
-          default:
-            break;
-        }
+        dispatch({
+          type: "refreshData"
+        });
 
       });
     }

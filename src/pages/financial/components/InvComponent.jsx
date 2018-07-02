@@ -14,7 +14,7 @@ function Tables({ dispatch, dateRange, loading, dataSource }) {
     });
 
     dispatch({
-      type: "financial/refreshInvData"
+      type: "financial/refreshData"
     });
   };
 
