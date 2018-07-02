@@ -1,17 +1,24 @@
 .header {
-  display: flex;
-  justify-content: flex-end;
-  margin: 0 0 10px 0;
-  .labelDesc {
-    padding-right: 10px;
-  }
-  .dateRange {
-    display: flex;
-    justify-content: flex-end;
-    flex-direction: column;
-    :global(.ant-calendar-picker) {
-      width: 220px;
+  .formItem {
+    width: 100%;
+    padding: 8px 0;
+    .formLabel {
+      padding-right: 10px;
     }
+    .formContainer {
+      width: 203px;
+    }
+  }
+  .formAction {
+    padding-top: 0;
+  }
+}
+
+.radioButton {
+  :global(.ant-radio-button-wrapper-checked) {
+    background: #1890ff;
+    border-color: #1890ff;
+    color: #fff;
   }
 }
 
@@ -23,6 +30,26 @@
   border-collapse: collapse;
   // min-width: 70%;
   width: 100%;
+
+  .tblMultiline {
+    p {
+      margin-bottom: 0;
+      text-align: right;
+      span {
+        font-weight: bold;
+        padding-right: 10px;
+      }
+    }
+  }
+  .tblSingleline {
+    p {
+      margin-bottom: 0;
+    }
+    p:first-child {
+      padding-top: 16px;
+    }
+  }
+
   td,
   th {
     border: solid 1px @table-border-color!important;
@@ -71,7 +98,7 @@
 }
 
 .pdfContainer {
-  margin-top: 40px;
+  margin-top: 20px;
   font-size: 9pt;
   .head {
     width: 100%;
@@ -107,6 +134,7 @@
   }
   .pdfContainer {
     margin-top: 0px;
+    border: none;
     .head {
       p {
         margin-bottom: 5px;
@@ -115,6 +143,9 @@
     }
     .action {
       display: none;
+    }
+    :global(.ant-card-body) {
+      padding: 0;
     }
   }
 }
