@@ -312,7 +312,7 @@ class InvComponent extends React.Component {
           ""
         ];
         return (
-          <tr className="ant-table-row">
+          <tr className={`ant-table-row ${styles.countRow}`}>
             {newRow.map((item, key) => (
               <td key={key} colSpan={key > 0 ? 1 : 2}>
                 {item}
