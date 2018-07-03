@@ -197,59 +197,79 @@ class InvComponent extends React.Component {
       // count data;
       let distData = R.groupWith((a, b) => a[0] === b[0])(data);
 
-      let TrComponent = ({ trData }) => (
-        <tr className="ant-table-row">
-          {trData[0].map((td, key) => {
-            if (key < 4) {
-              return <td key={key}>{td}</td>;
-            }
+      let TrComponent = ({ trData }, i) => {
+        let newRow = trData[0].slice(0, 4);
+        trData[0].forEach((td, key) => {
+          if (key < 4) {
+            return;
+          }
+          if ([4, 5, 7, 8, 10, 11].includes(key)) {
+            let sum = 0;
+            trData.forEach(item => {
+              // 汇总第key条数据
+              sum += parseFloat(item[key]);
+            });
+            newRow[key] = "小计:" + sum;
+          } else {
+            newRow[key] = "";
+          }
+        });
+        let newTrData = trData.map(item => item.slice(4, 13));
 
-            if ([4, 5, 7, 8, 10, 11].includes(key)) {
-              let sum = 0;
-              trData.forEach(item => {
-                // 汇总第key条数据
-                sum += parseFloat(item[key]);
-              });
-              return (
-                <td className={styles.tblMultiline}>
-                  <p>
-                    <span>小计:</span>
-                    {sum}
-                  </p>
-                  {trData.map((td, tdkey) => <p key={tdkey}>{td[key]}</p>)}
-                </td>
-              );
-            }
-            return (
-              <td className={styles.tblSingleline}>
-                {trData.map((td, tdkey) => <p key={tdkey}>{td[key]}</p>)}
-              </td>
-            );
-          })}
-        </tr>
-      );
-
-      let TbodyComponent = distData.map(trData => {
-        if (trData.length === 1) {
-          return (
+        return (
+          <>
             <tr className="ant-table-row">
-              {trData[0].map((td, keyTd) => <td key={keyTd}>{td}</td>)}
+              {newRow.map((td, keyTd) => (
+                <td
+                  key={keyTd}
+                  rowSpan={keyTd < 4 ? trData.length + 1 : 1}
+                  style={{ textAlign: keyTd < 2 ? "left" : "right" }}
+                >
+                  {td}
+                </td>
+              ))}
             </tr>
-          );
-        }
-        return <TrComponent trData={trData} />;
-      });
+            {newTrData.map((trs, j) => (
+              <tr className="ant-table-row" key={j}>
+                {trs.map((td, keyTd) => (
+                  <td
+                    key={keyTd}
+                    style={{
+                      textAlign: (keyTd + 1) % 3 === 0 ? "left" : "right"
+                    }}
+                  >
+                    {td}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </>
+        );
+      };
 
-      return (
-        <tbody className="ant-table-tbody">
-          {TbodyComponent}
-          {/* {data.map((tr, key) => (
+      let TbodyComponent = distData.map(
+        (trData, key) =>
+          trData.length === 1 ? (
             <tr className="ant-table-row" key={key}>
-              {tr.map((td, keyTd) => <td key={keyTd}>{td}</td>)}
+              {trData[0].map((td, keyTd) => (
+                <td
+                  key={keyTd}
+                  style={{
+                    textAlign: [2, 3, 4, 5, 7, 8, 10, 11].includes(keyTd)
+                      ? "right"
+                      : "left"
+                  }}
+                >
+                  {td}
+                </td>
+              ))}
             </tr>
-          ))} */}
-        </tbody>
+          ) : (
+            <TrComponent trData={trData} key={key} />
+          )
       );
+
+      return <tbody className="ant-table-tbody">{TbodyComponent}</tbody>;
     };
 
     return (

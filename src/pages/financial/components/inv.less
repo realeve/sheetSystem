@@ -28,27 +28,8 @@
   border-bottom: 2px solid @table-border-color;
   border-radius: 0;
   border-collapse: collapse;
-  // min-width: 70%;
   width: 100%;
-
-  .tblMultiline {
-    p {
-      margin-bottom: 0;
-      text-align: right;
-      span {
-        font-weight: bold;
-        padding-right: 10px;
-      }
-    }
-  }
-  .tblSingleline {
-    p {
-      margin-bottom: 0;
-    }
-    p:first-child {
-      padding-top: 16px;
-    }
-  }
+  font-family: "Times New Roman";
 
   td,
   th {
@@ -91,7 +72,7 @@
   tbody {
     tr:first-child {
       td {
-        border-top: 2px solid @table-border-color;
+        border-top: 2px solid @table-border-color!important;
       }
     }
   }
@@ -99,7 +80,7 @@
 
 .pdfContainer {
   margin-top: 20px;
-  font-size: 9pt;
+  font-size: 10.5pt;
   .head {
     width: 100%;
     margin-bottom: 20px;
