@@ -39,11 +39,8 @@ export default {
         case '/inv':
           dataSource = yield call(db.getPeriodInv, curId, latestId);
           break;
-        case '/pay':
-          dataSource = yield call(db.getPeriodPay, curId);
-          break;
-        case '/rec':
-          dataSource = yield call(db.getPeriodRec, curId);
+        case '/excess':
+          dataSource = yield call(db.getExcess, '呆滞期间');
           break;
         default:
           break;

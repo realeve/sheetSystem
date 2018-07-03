@@ -12,7 +12,8 @@ const API = {
   PERIOD_MAXID: DEV ? LOCAL + "bc2e7d3404_periodid.json" : SERV + "150/bc2e7d3404.html",
   IF_INV: DEV ? LOCAL + "f0d7f4eab9_inv.json" : SERV + "151/f0d7f4eab9/array.html",
   IF_PAY: DEV ? LOCAL + "16a5f99c46_pay.json" : SERV + "152/9b089d2e3c.html",
-  IF_REC: DEV ? LOCAL + "9b089d2e3c_rec.json" : SERV + "153/16a5f99c46.html"
+  IF_REC: DEV ? LOCAL + "9b089d2e3c_rec.json" : SERV + "153/16a5f99c46.html",
+  EXCESS_INV: DEV ? LOCAL + 'excessInv.json' : SERV + '/'
 };
 
 export const getPeriodid = async periodName => {
@@ -60,3 +61,11 @@ export const getPeriodRec = async periodid => {
     url
   })
 };
+
+// 呆滞距今时间
+export const getExcess = async type => {
+  let url = API.EXCESS_INV + '?type=' + type;
+  return await axios({
+    url
+  })
+}

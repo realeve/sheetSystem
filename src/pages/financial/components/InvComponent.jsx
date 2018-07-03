@@ -174,32 +174,37 @@ class InvComponent extends React.Component {
     const TableTitle = () => (
       <div className={styles.head}>
         <h2>物料收付存统计查询</h2>
-        <p>
-          <span>查询期间：</span>
-          <span>{this.state.periodName}</span>
-        </p>
-        <p>
-          <span>统计类型：</span>
-          <span>
-            {this.state.statType === "1" ? "期初至今" : "本期年初至今"}
-          </span>
-        </p>
-        <p>
-          <span>库存组织：</span>
-          <span>{this.state.orgName}</span>
-        </p>
-        {this.state.materialSN.length > 0 && (
-          <p>
-            <span>{this.state.materialType ? "物料编码" : "物料名称 "}：</span>
-            <span>{this.state.materialSN}</span>
-          </p>
-        )}
-        {this.state.aliasName.length > 0 && (
-          <p>
-            <span>帐户别名：</span>
-            <span>{this.state.aliasName}</span>
-          </p>
-        )}
+        <ul>
+          <li>
+            <span>查询期间：</span>
+            <div>{this.state.periodName}</div>
+          </li>
+          <li>
+            <span>统计类型：</span>
+            <div>
+              {this.state.statType === "1" ? "期初至今" : "本期年初至今"}
+            </div>
+          </li>
+          <li>
+            <span>库存组织：</span>
+            <div>{this.state.orgName}</div>
+          </li>
+          {this.state.materialSN.length > 0 && (
+            <li>
+              <span>
+                {this.state.materialType ? "物料编码" : "物料名称 "}：
+              </span>
+              <div>{this.state.materialSN}</div>
+            </li>
+          )}
+
+          {this.state.aliasName.length > 0 && (
+            <li>
+              <span>帐户别名：</span>
+              <div>{this.state.aliasName}</div>
+            </li>
+          )}
+        </ul>
       </div>
     );
 
