@@ -1,6 +1,6 @@
 import React from "react";
 import { connect } from "dva";
-import { DatePicker, Button, Icon, Row, Col, Card } from "antd";
+import { DatePicker, Button, Icon, Row, Col } from "antd";
 import { Radio, Select, Input } from "antd";
 
 import styles from "./inv.less";
