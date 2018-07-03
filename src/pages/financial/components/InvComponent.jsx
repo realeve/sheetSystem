@@ -288,7 +288,46 @@ class InvComponent extends React.Component {
           )
       );
 
-      return <tbody className="ant-table-tbody">{TbodyComponent}</tbody>;
+      // 数据列汇总
+      let DatacountComponent = () => {
+        let sumData = idx => {
+          let sum = 0;
+          data.forEach(trData => {
+            sum += parseFloat(trData[idx]);
+          });
+          return sum;
+        };
+        let newRow = [
+          "汇总",
+          sumData(2),
+          sumData(3),
+          sumData(4),
+          sumData(5),
+          "",
+          sumData(7),
+          sumData(8),
+          "",
+          sumData(10),
+          sumData(11),
+          ""
+        ];
+        return (
+          <tr className="ant-table-row">
+            {newRow.map((item, key) => (
+              <td key={key} colSpan={key > 0 ? 1 : 2}>
+                {item}
+              </td>
+            ))}
+          </tr>
+        );
+      };
+
+      return (
+        <tbody className="ant-table-tbody">
+          {TbodyComponent}
+          <DatacountComponent />
+        </tbody>
+      );
     };
 
     return (
