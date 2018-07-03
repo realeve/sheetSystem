@@ -104,7 +104,9 @@ export const handleInvData = invData => {
     inputInfo,
     outputInfo,
     remainInfo
-  }) => ((inputInfo.map((item, idx) => [...baseInfo, ...item, ...outputInfo[idx], ...remainInfo[idx]])))
+  }) => (inputInfo.length > 0 ? (inputInfo.map((item, idx) => [...baseInfo, ...item, ...outputInfo[idx], ...remainInfo[idx]])) : [
+    [...baseInfo, ...(new Array(9).fill(''))]
+  ])
 
   let data = snList.map(item => {
     let snItems = R.filter(R.propEq('sn', item.sn))(invData);
@@ -117,7 +119,6 @@ export const handleInvData = invData => {
       remainInfo = handleSNInfo(snItems, 3);
     // 最大数据行级
     let maxLength = R.max((R.max(inputInfo.length, outputInfo.length)), remainInfo.length);
-
 
     // 数据补齐
     inputInfo = extendIORInfo(inputInfo, maxLength);

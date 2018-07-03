@@ -216,6 +216,55 @@
     "figure": 7,
     "remark": "油墨库",
     "type": 3
+  }, {
+    "sn": "3213.000006",
+    "name": "某物料",
+    "quantity": 6,
+    "figure": 7,
+    "remark": "某部门",
+    "type": 0
+  }, {
+    "sn": "3213.000007",
+    "name": "某物料",
+    "quantity": 6,
+    "figure": 7,
+    "remark": "某部门",
+    "type": 1
+  }, {
+    "sn": "3213.000008",
+    "name": "某物料",
+    "quantity": 6,
+    "figure": 7,
+    "remark": "某部门",
+    "type": 2
+  }, {
+    "sn": "3213.000009",
+    "name": "某物料",
+    "quantity": 6,
+    "figure": 7,
+    "remark": "某部门",
+    "type": 3
+  }, {
+    "sn": "3213.000010",
+    "name": "某物料",
+    "quantity": 12,
+    "figure": 7,
+    "remark": "",
+    "type": 0
+  }, {
+    "sn": "3213.000010",
+    "name": "某物料",
+    "quantity": 6,
+    "figure": 7,
+    "remark": "某部门",
+    "type": 2
+  }, {
+    "sn": "3213.000010",
+    "name": "某物料",
+    "quantity": 6,
+    "figure": 7,
+    "remark": "某部门",
+    "type": 3
   }],
   "title": "按区间查询ERP结存",
   "rows": 9,
