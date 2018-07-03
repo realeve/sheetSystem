@@ -6,40 +6,42 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    padding: 0 50px; // margin-top: 64px;
+    padding: 0 50px;
     .breadCrumb {
       margin: 16px 0;
     }
     .content {
-      // background: #fff;
-      // padding: 24px;
-      min-height: 780px;
       background: #f0f2f5;
       padding: 0;
+      height: 100%;
+      border: none;
     }
   }
   .footer {
     text-align: center;
   }
 }
-
+.clear {
+  padding: 0;
+  margin: 0;
+  box-shadow: none;
+  border: none;
+}
 @media print {
   .main {
     background: #fff;
     .container {
-      padding: 0;
+      .clear;
       .breadCrumb {
         display: none;
       }
       .content {
-        padding: 0;
-        min-height: 180px;
+        .clear;
       }
     }
     .footer {
       display: none;
-      padding: 0;
-      margin: 0;
+      .clear;
     }
   }
 }

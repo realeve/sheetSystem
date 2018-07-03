@@ -332,10 +332,13 @@ class InvComponent extends React.Component {
 
     return (
       <>
-        <Card title="查询条件" className={styles.header}>
-          <QueryHeader />
-        </Card>
-        <Card className={styles.pdfContainer}>
+        <div className={styles.card}>
+          <div className={styles.title}>查询条件</div>
+          <div className={styles.header}>
+            <QueryHeader />
+          </div>
+        </div>
+        <div className={styles.pdfContainer}>
           <TableTitle />
           <table>
             <thead>
@@ -407,7 +410,7 @@ class InvComponent extends React.Component {
               打印报表 <Icon type="printer" />
             </Button>
           </div>
-        </Card>
+        </div>
       </>
     );
   }

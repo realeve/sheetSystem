@@ -10,30 +10,41 @@ font-face {
 @fontname: "MingLiU", "PMingLiU", "Microsoft JhengHei", "DengXian", "等线",
   "微软雅黑", "YaHei", "Microsoft YaHei";
 
-.header {
-  .formItem {
-    width: 100%;
-    padding: 8px 0;
-    .formLabel {
-      padding-right: 10px;
-      position: relative;
-    }
-    .required {
-      &::before {
-        content: "*";
-        position: absolute;
-        color: #e23;
-        left: -10px;
-        top: 0px;
-        font-size: 12pt;
+.card {
+  background: #fff;
+  border-radius: 3px;
+  .title {
+    padding: 10px 20px;
+    border-bottom: 1px solid #eee;
+    font-size: 12pt;
+    font-weight: bold;
+  }
+  .header {
+    padding: 20px;
+    .formItem {
+      width: 100%;
+      padding: 8px 0;
+      .formLabel {
+        padding-right: 10px;
+        position: relative;
+      }
+      .required {
+        &::before {
+          content: "*";
+          position: absolute;
+          color: #e23;
+          left: -10px;
+          top: 0px;
+          font-size: 12pt;
+        }
+      }
+      .formContainer {
+        width: 203px;
       }
     }
-    .formContainer {
-      width: 203px;
+    .formAction {
+      padding-top: 0;
     }
-  }
-  .formAction {
-    padding-top: 0;
   }
 }
 
@@ -117,7 +128,9 @@ font-face {
   margin-top: 20px;
   font-size: 10.5pt;
   font-family: @fontname;
-
+  background: #fff;
+  border-radius: 3px;
+  padding: 20px;
   .head {
     width: 100%;
     margin-bottom: 15px;
@@ -153,12 +166,11 @@ font-face {
 }
 
 @media print {
-  .header {
+  .card {
     display: none;
   }
   .pdfContainer {
     margin-top: 0px;
-    border: none;
     .head {
       p {
         margin-bottom: 5px;
@@ -167,9 +179,8 @@ font-face {
     }
     .action {
       display: none;
-    }
-    :global(.ant-card-body) {
-      padding: 0;
+      margin: 0;
+      height: 0;
     }
   }
 }
