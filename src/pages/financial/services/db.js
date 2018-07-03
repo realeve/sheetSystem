@@ -4,6 +4,7 @@ import {
 } from "../../../utils/axios";
 
 import moment from "moment";
+const R = require('ramda');
 
 const LOCAL = "http://localhost:8000/data/";
 
@@ -69,3 +70,71 @@ export const getExcess = async type => {
     url
   })
 }
+
+export const handleInvData = invData => {
+  let snList = R.uniq(R.map(R.pick(['sn', 'name']))(invData));
+
+  // 获取期初情况
+  const getBaseInfo = snItems => {
+    let baseInfo = R.find(R.propEq('type', 0))(snItems);
+    if (R.isNil(baseInfo)) {
+      baseInfo = {
+        sn: snItems[0].sn,
+        name: snItems[0].name,
+        quantity: 0,
+        figure: 0,
+        remark: ''
+      }
+    }
+    return R.compose(R.init, R.values, R.pickBy((val, key) => key !== 'type'))(baseInfo);
+  }
+
+  const handleSNInfo = (snItems, idx) => R.compose(R.map(R.values), R.map(R.pick(['quantity', 'figure', 'remark'])), R.filter(R.propEq('type', idx)))(snItems)
+
+  const extendIORInfo = (iorInfo, maxLength) => {
+    let appendLen = maxLength - iorInfo.length;
+    for (var i = 0; i < appendLen; i++) {
+      iorInfo.push(['', '', ''])
+    }
+    return iorInfo;
+  }
+
+  const linkIORInfo = ({
+    baseInfo,
+    inputInfo,
+    outputInfo,
+    remainInfo
+  }) => ((inputInfo.map((item, idx) => [...baseInfo, ...item, ...outputInfo[idx], ...remainInfo[idx]])))
+
+  let data = snList.map(item => {
+    let snItems = R.filter(R.propEq('sn', item.sn))(invData);
+    // 期初信息
+    let baseInfo = getBaseInfo(snItems);
+
+    // 收付存信息
+    let inputInfo = handleSNInfo(snItems, 1),
+      outputInfo = handleSNInfo(snItems, 2),
+      remainInfo = handleSNInfo(snItems, 3);
+    // 最大数据行级
+    let maxLength = R.max((R.max(inputInfo.length, outputInfo.length)), remainInfo.length);
+
+
+    // 数据补齐
+    inputInfo = extendIORInfo(inputInfo, maxLength);
+    outputInfo = extendIORInfo(outputInfo, maxLength);
+    remainInfo = extendIORInfo(remainInfo, maxLength);
+
+    // 连接数据
+    return linkIORInfo({
+      baseInfo,
+      inputInfo,
+      outputInfo,
+      remainInfo
+    });
+  });
+  let dist = [];
+  data.forEach(item => {
+    dist = [...dist, ...item]
+  })
+  return dist;
+};

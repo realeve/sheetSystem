@@ -226,9 +226,9 @@ class InvComponent extends React.Component {
             let sum = 0;
             trData.forEach(item => {
               // 汇总第key条数据
-              sum += parseFloat(item[key]);
+              sum += parseFloat("0" + item[key]);
             });
-            newRow[key] = "小计:" + sum;
+            newRow[key] = "小计: " + sum;
           } else {
             newRow[key] = "";
           }
@@ -293,14 +293,28 @@ class InvComponent extends React.Component {
         let sumData = idx => {
           let sum = 0;
           data.forEach(trData => {
-            sum += parseFloat(trData[idx]);
+            sum += parseFloat("0" + trData[idx]);
           });
           return sum;
         };
+
+        // 起初情况数据汇总
+        let sumBaseData = idx => {
+          let sum = 0;
+          let baseData = R.compose(
+            R.uniq,
+            R.map(R.pick(["0", "1", "2", "3"]))
+          )(data);
+          baseData.forEach(trData => {
+            sum += parseFloat("0" + trData[idx]);
+          });
+          return sum;
+        };
+
         let newRow = [
           "汇总",
-          sumData(2),
-          sumData(3),
+          sumBaseData(2),
+          sumBaseData(3),
           sumData(4),
           sumData(5),
           "",

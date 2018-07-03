@@ -38,6 +38,7 @@ export default {
       switch (router) {
         case '/inv':
           dataSource = yield call(db.getPeriodInv, curId, latestId);
+          dataSource.data = db.handleInvData(dataSource.data);
           break;
         case '/excess':
           dataSource = yield call(db.getExcess, '呆滞期间');
