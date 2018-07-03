@@ -4,6 +4,17 @@
     padding: 8px 0;
     .formLabel {
       padding-right: 10px;
+      position: relative;
+    }
+    .required {
+      &::before {
+        content: "*";
+        position: absolute;
+        color: #e23;
+        left: -10px;
+        top: 0px;
+        font-size: 12pt;
+      }
     }
     .formContainer {
       width: 203px;

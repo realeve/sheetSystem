@@ -49,7 +49,6 @@ class InvComponent extends React.Component {
   };
 
   handleOrgChange = orgName => {
-    console.log(orgName);
     this.setState({
       orgName
     });
@@ -73,7 +72,16 @@ class InvComponent extends React.Component {
   };
 
   queryData = () => {
-    console.log("query");
+    // 必选的输入框无法清除，始终会有数据，故无需做数据校验
+
+    const { periodName, statType, orgName, materialSN, aliasName } = this.state;
+    console.log({
+      periodName,
+      statType,
+      orgName,
+      materialSN,
+      aliasName
+    });
   };
 
   render() {
@@ -83,7 +91,9 @@ class InvComponent extends React.Component {
         <Row gutter={8}>
           <Col span={12}>
             <div className={[styles.formItem, styles.formAction].join(" ")}>
-              <label className={styles.formLabel}>查询期间:</label>
+              <label className={[styles.formLabel, styles.required].join(" ")}>
+                查询期间:
+              </label>
               <DatePicker.MonthPicker
                 allowClear={false}
                 format="YYYY-MM"
@@ -93,7 +103,9 @@ class InvComponent extends React.Component {
               />
             </div>
             <div className={styles.formItem}>
-              <label className={styles.formLabel}>统计类型:</label>
+              <label className={[styles.formLabel, styles.required].join(" ")}>
+                统计类型:
+              </label>
               <RadioGroup
                 className={styles.radioButton}
                 defaultValue={this.state.statType}
@@ -104,7 +116,9 @@ class InvComponent extends React.Component {
               </RadioGroup>
             </div>
             <div className={styles.formItem}>
-              <label className={styles.formLabel}>库存组织:</label>
+              <label className={[styles.formLabel, styles.required].join(" ")}>
+                库存组织:
+              </label>
               <Select
                 showSearch
                 className={styles.formContainer}
