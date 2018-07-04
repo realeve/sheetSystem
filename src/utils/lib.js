@@ -4,7 +4,6 @@ import {
   uploadHost
 } from "./axios";
 import http from "axios";
-const R = require('ramda');
 
 export const searchUrl = "http://10.8.2.133/search#";
 export const imgUrl = "http://10.8.2.133/search/image#";
@@ -209,7 +208,7 @@ export let dataFile2URI = async (file, callback) => {
  * @param {数字} num 
  * @param {小数位数} decimalLength 
  */
-export const thouandsNum = (num, decimalLength = 3) => {
+export const thouandsNum = (num, decimalLength = 2) => {
   if (String(num).length === 0) {
     return ''
   }
@@ -219,5 +218,5 @@ export const thouandsNum = (num, decimalLength = 3) => {
     let [integer, decimal] = num.split(".");
     return integer + "." + decimal.padEnd(decimalLength, "0");
   }
-  return num + '.000';
+  return num + '.00';
 }

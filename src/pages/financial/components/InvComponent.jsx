@@ -364,7 +364,7 @@ class InvComponent extends React.Component {
                 <th rowSpan="2">
                   <span>物料编码</span>
                 </th>
-                <th rowSpan="2">
+                <th rowSpan="2" width="160">
                   <span>物料名称</span>
                 </th>
                 <th colSpan="2">
@@ -393,7 +393,7 @@ class InvComponent extends React.Component {
                 <th>
                   <span>金额</span>
                 </th>
-                <th>
+                <th width="70">
                   <span>来源</span>
                 </th>
                 <th>
@@ -402,7 +402,7 @@ class InvComponent extends React.Component {
                 <th>
                   <span>金额</span>
                 </th>
-                <th>
+                <th width="70">
                   <span>帐户别名</span>
                 </th>
                 <th>
@@ -411,7 +411,7 @@ class InvComponent extends React.Component {
                 <th>
                   <span>金额</span>
                 </th>
-                <th>
+                <th width="70">
                   <span>子库名称</span>
                 </th>
               </tr>
