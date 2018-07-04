@@ -2,6 +2,7 @@ import React from "react";
 import { connect } from "dva";
 import { DatePicker, Button, Icon, Row, Col } from "antd";
 import { Radio, Select, Input } from "antd";
+import * as lib from "../../../utils/lib";
 
 import styles from "./inv.less";
 import moment from "moment";
@@ -58,7 +59,7 @@ class InvComponent extends React.Component {
   //   option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0;
 
   onChangeMaterialSN = e => {
-    const materialType = /^\d*.\d*$/.test(e.target.value);
+    const materialType = /\d*.\d*/.test(e.target.value);
     this.setState({
       materialSN: e.target.value,
       materialType
@@ -216,6 +217,9 @@ class InvComponent extends React.Component {
       // count data;
       let distData = R.groupWith((a, b) => a[0] === b[0])(data);
 
+      let handleTdData = (td, keyTd) =>
+        [2, 3, 4, 5, 7, 8, 10, 11].includes(keyTd) ? lib.thouandsNum(td) : td;
+
       let TrComponent = ({ trData }, i) => {
         let newRow = trData[0].slice(0, 4);
         trData[0].forEach((td, key) => {
@@ -226,9 +230,9 @@ class InvComponent extends React.Component {
             let sum = 0;
             trData.forEach(item => {
               // 汇总第key条数据
-              sum += parseFloat("0" + item[key]);
+              sum += Number(item[key]);
             });
-            newRow[key] = "小计: " + sum;
+            newRow[key] = sum !== 0 ? "小计: " + lib.thouandsNum(sum) : "";
           } else {
             newRow[key] = "";
           }
@@ -257,7 +261,7 @@ class InvComponent extends React.Component {
                       textAlign: (keyTd + 1) % 3 === 0 ? "left" : "right"
                     }}
                   >
-                    {td}
+                    {(keyTd + 1) % 3 === 0 ? td : lib.thouandsNum(td)}
                   </td>
                 ))}
               </tr>
@@ -279,7 +283,7 @@ class InvComponent extends React.Component {
                       : "left"
                   }}
                 >
-                  {td}
+                  {handleTdData(td, keyTd)}
                 </td>
               ))}
             </tr>
@@ -293,9 +297,9 @@ class InvComponent extends React.Component {
         let sumData = idx => {
           let sum = 0;
           data.forEach(trData => {
-            sum += parseFloat("0" + trData[idx]);
+            sum += Number(trData[idx]);
           });
-          return sum;
+          return lib.thouandsNum(sum);
         };
 
         // 起初情况数据汇总
@@ -306,9 +310,9 @@ class InvComponent extends React.Component {
             R.map(R.pick(["0", "1", "2", "3"]))
           )(data);
           baseData.forEach(trData => {
-            sum += parseFloat("0" + trData[idx]);
+            sum += Number(trData[idx]);
           });
-          return sum;
+          return lib.thouandsNum(sum);
         };
 
         let newRow = [

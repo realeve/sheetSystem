@@ -11,10 +11,11 @@ const LOCAL = "http://localhost:8000/data/";
 const SERV = "http://10.8.1.25:100/api/";
 const API = {
   PERIOD_MAXID: DEV ? LOCAL + "bc2e7d3404_periodid.json" : SERV + "150/bc2e7d3404.html",
-  IF_INV: DEV ? LOCAL + "f0d7f4eab9_inv.json" : SERV + "151/f0d7f4eab9/array.html",
+  IF_INV: DEV ? LOCAL + "f0d7f4eab9_inv.json" : SERV + "151/f0d7f4eab9.html",
   IF_PAY: DEV ? LOCAL + "16a5f99c46_pay.json" : SERV + "152/9b089d2e3c.html",
   IF_REC: DEV ? LOCAL + "9b089d2e3c_rec.json" : SERV + "153/16a5f99c46.html",
-  EXCESS_INV: DEV ? LOCAL + 'excessInv.json' : SERV + '/'
+  EXCESS_INV: DEV ? LOCAL + 'excessInv.json' : SERV + '/',
+  IF_REMAIN: DEV ? LOCAL + '713e3e1011_invSub.json' : SERV + '154/713e3e1011.html'
 };
 
 export const getPeriodid = async periodName => {
@@ -42,26 +43,55 @@ export const getPeriodDate = async curDay => {
   };
 };
 
-export const getPeriodInv = async (startPeriodid, endPeriodid) => {
-  let url = API.IF_INV + "?tstart=" + startPeriodid + "&tend=" + endPeriodid;
-  return await axios({
-    url
-  })
-};
+export const getPeriodInv = async params => {
+  let baseData = await axios({
+    url: API.IF_INV,
+    params
+  });
+  let inputData = await axios({
+    url: API.IF_PAY,
+    params
+  });
+  let outputData = await axios({
+    url: API.IF_REC,
+    params
+  });
+  let remainData = await axios({
+    url: API.IF_REMAIN,
+    params
+  });
 
-export const getPeriodPay = async periodid => {
-  let url = API.IF_PAY + "?periodid=" + periodid;
-  return await axios({
-    url
-  })
-};
+  // 此处数据行数过大，暂时只输出80条.
+  baseData = Object.assign(baseData, {
+    data: [...baseData.data.slice(0, 20), ...inputData.data.slice(0, 20), ...outputData.data.slice(0, 20), ...remainData.data.slice(0, 20)],
+    title: '物料收付存统计查询'
+  });
+  baseData.rows = baseData.data.length;
+  return baseData;
+}
 
-export const getPeriodRec = async periodid => {
-  let url = API.IF_REC + "?periodid=" + periodid;
-  return await axios({
-    url
-  })
-};
+// export const getPeriodInv = async (startPeriodid, endPeriodid) => {
+//   let url = API.IF_INV + "?tstart=" + startPeriodid + "&tend=" + endPeriodid;
+//   return await axios({
+//     url
+//   })
+// };
+
+// export const getPeriodPay = async periodid => {
+//   let url = API.IF_PAY + "?periodid=" + periodid;
+//   return await axios({
+//     url
+//   })
+// };
+
+// export const getPeriodRec = async periodid => {
+//   let url = API.IF_REC + "?periodid=" + periodid;
+//   return await axios({
+//     url
+//   })
+// };
+
+
 
 // 呆滞距今时间
 export const getExcess = async type => {
@@ -73,10 +103,9 @@ export const getExcess = async type => {
 
 export const handleInvData = invData => {
   let snList = R.uniq(R.map(R.pick(['sn', 'name']))(invData));
-
   // 获取期初情况
   const getBaseInfo = snItems => {
-    let baseInfo = R.find(R.propEq('type', 0))(snItems);
+    let baseInfo = R.find(R.propEq('type', '0'))(snItems);
     if (R.isNil(baseInfo)) {
       baseInfo = {
         sn: snItems[0].sn,
@@ -112,11 +141,10 @@ export const handleInvData = invData => {
     let snItems = R.filter(R.propEq('sn', item.sn))(invData);
     // 期初信息
     let baseInfo = getBaseInfo(snItems);
-
     // 收付存信息
-    let inputInfo = handleSNInfo(snItems, 1),
-      outputInfo = handleSNInfo(snItems, 2),
-      remainInfo = handleSNInfo(snItems, 3);
+    let inputInfo = handleSNInfo(snItems, '1'),
+      outputInfo = handleSNInfo(snItems, '2'),
+      remainInfo = handleSNInfo(snItems, '3');
     // 最大数据行级
     let maxLength = R.max((R.max(inputInfo.length, outputInfo.length)), remainInfo.length);
 

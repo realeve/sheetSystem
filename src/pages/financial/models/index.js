@@ -29,15 +29,16 @@ export default {
         router
       } = yield select(state => state[namespace]);
       const {
-        curId,
-        latestId
+        curId
       } = yield call(db.getPeriodDate, dateRange[1]);
-
       // 根据路由调整数据
       let dataSource = [];
       switch (router) {
         case '/inv':
-          dataSource = yield call(db.getPeriodInv, curId, latestId);
+          dataSource = yield call(db.getPeriodInv, {
+            periodid: curId
+          });
+
           dataSource.data = db.handleInvData(dataSource.data);
           break;
         case '/excess':
