@@ -3,6 +3,7 @@ import { connect } from "dva";
 import { DatePicker, Button, Icon, Row, Col } from "antd";
 import { Radio, Select, Input } from "antd";
 import * as lib from "../../../utils/lib";
+import LoadingComponent from "./loadingComponent";
 
 import styles from "./inv.less";
 import moment from "moment";
@@ -38,9 +39,9 @@ class InvComponent extends React.Component {
       periodName: dateStrings.substr(0, 7)
     });
 
-    this.props.dispatch({
-      type: "financial/refreshData"
-    });
+    // this.props.dispatch({
+    //   type: "financial/refreshData"
+    // });
   };
 
   handleStatTypeChange = e => {
@@ -74,16 +75,22 @@ class InvComponent extends React.Component {
 
   queryData = () => {
     // 必选的输入框无法清除，始终会有数据，故无需做数据校验
-
     const { periodName, statType, orgName, materialSN, aliasName } = this.state;
-    console.log({
-      periodName,
-      statType,
-      orgName,
-      materialSN,
-      aliasName
+    this.props.dispatch({
+      type: "financial/refreshData",
+      payload: {
+        periodName,
+        statType,
+        orgName,
+        materialSN,
+        aliasName
+      }
     });
   };
+
+  componentDidMount() {
+    this.queryData();
+  }
 
   render() {
     const QueryHeader = () => {
@@ -112,8 +119,8 @@ class InvComponent extends React.Component {
                 defaultValue={this.state.statType}
                 onChange={this.handleStatTypeChange}
               >
-                <RadioButton value="1">期初至今</RadioButton>
-                <RadioButton value="2">本期年初至今</RadioButton>
+                <RadioButton value="0">期初至今</RadioButton>
+                <RadioButton value="1">本期年初至今</RadioButton>
               </RadioGroup>
             </div>
             <div className={styles.formItem}>
@@ -183,7 +190,7 @@ class InvComponent extends React.Component {
           <li>
             <span>统计类型：</span>
             <div>
-              {this.state.statType === "1" ? "期初至今" : "本期年初至今"}
+              {this.state.statType === "0" ? "期初至今" : "本期年初至今"}
             </div>
           </li>
           <li>
@@ -416,7 +423,11 @@ class InvComponent extends React.Component {
                 </th>
               </tr>
             </thead>
-            <TableBody />
+            {this.props.loading ? (
+              <LoadingComponent colSpan="13" />
+            ) : (
+              <TableBody />
+            )}
           </table>
           <div className={styles.action}>
             <Button

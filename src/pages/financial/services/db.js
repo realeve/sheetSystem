@@ -14,8 +14,9 @@ const API = {
   IF_INV: DEV ? LOCAL + "f0d7f4eab9_inv.json" : SERV + "151/f0d7f4eab9.html",
   IF_PAY: DEV ? LOCAL + "16a5f99c46_pay.json" : SERV + "152/9b089d2e3c.html",
   IF_REC: DEV ? LOCAL + "9b089d2e3c_rec.json" : SERV + "153/16a5f99c46.html",
-  EXCESS_INV: DEV ? LOCAL + 'excessInv.json' : SERV + '/',
-  IF_REMAIN: DEV ? LOCAL + '713e3e1011_invSub.json' : SERV + '154/713e3e1011.html'
+  EXCESS_INV: DEV ? LOCAL + '117dd652a7_inv_alanysis.json' : SERV + '155/117dd652a7/array.html',
+  IF_REMAIN: DEV ? LOCAL + '713e3e1011_invSub.json' : SERV + '154/713e3e1011.html',
+  IF_IOS_COMBINE: DEV ? LOCAL + '/4653126720_ios_combine.json' : SERV + '156/4653126720.html',
 };
 
 export const getPeriodid = async periodName => {
@@ -43,11 +44,44 @@ export const getPeriodDate = async curDay => {
   };
 };
 
-export const getPeriodInv = async params => {
+/**
+*   @database: { 数管测试库 }
+*   @desc:     { 物料收付存统计查询 } 
+    const { periodid, baseid, sn, name } = params;
+*/
+export const getIOSInv = async params => {
+  return await axios({
+    url: API.IF_IOS_COMBINE,
+    params,
+  }).then(res => {
+    res.data = res.data.slice(0, 500);
+    return res;
+  });
+}
+
+export const getPeriodInv = async ({
+  baseid,
+  periodid,
+  orgName,
+  sn,
+  name
+}) => {
+  let params = {
+    periodid,
+    sn,
+    name
+  };
+  // 期初数据
   let baseData = await axios({
     url: API.IF_INV,
-    params
+    params: {
+      period: baseid,
+      sn,
+      name
+    }
   });
+
+  // 收付存数据
   let inputData = await axios({
     url: API.IF_PAY,
     params
@@ -70,36 +104,15 @@ export const getPeriodInv = async params => {
   return baseData;
 }
 
-// export const getPeriodInv = async (startPeriodid, endPeriodid) => {
-//   let url = API.IF_INV + "?tstart=" + startPeriodid + "&tend=" + endPeriodid;
-//   return await axios({
-//     url
-//   })
-// };
-
-// export const getPeriodPay = async periodid => {
-//   let url = API.IF_PAY + "?periodid=" + periodid;
-//   return await axios({
-//     url
-//   })
-// };
-
-// export const getPeriodRec = async periodid => {
-//   let url = API.IF_REC + "?periodid=" + periodid;
-//   return await axios({
-//     url
-//   })
-// };
-
-
-
-// 呆滞距今时间
-export const getExcess = async type => {
-  let url = API.EXCESS_INV + '?type=' + type;
-  return await axios({
-    url
-  })
-}
+/**
+*   @database: { 数管测试库 }
+*   @desc:     { ERP呆滞库存库存分析 } 
+    const { from, to, periodid } = params;
+*/
+export const getExcess = async params => await axios({
+  url: API.EXCESS_INV,
+  params
+})
 
 export const handleInvData = invData => {
   let snList = R.uniq(R.map(R.pick(['sn', 'name']))(invData));

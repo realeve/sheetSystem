@@ -1,7 +1,8 @@
 import React from "react";
 import { connect } from "dva";
 import { Button, Icon, Slider } from "antd";
-
+import * as lib from "../../../utils/lib";
+import LoadingComponent from "./loadingComponent";
 import styles from "./inv.less";
 import moment from "moment";
 import "moment/locale/zh-cn";
@@ -13,26 +14,36 @@ class InvComponent extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      timeLength: 3
+      timeLength: 3,
+      timeDesc: ["1-2年", "2-3年", "3-4年", "4-5年", "5年以上"]
     };
   }
 
   handleStatTypeChange = e => {
     this.setState({
-      statType: e.target.value
+      timeLength: e.target.value
     });
   };
 
   queryData = () => {
     // 必选的输入框无法清除，始终会有数据，故无需做数据校验
     const { timeLength } = this.state;
-    console.log({
-      timeLength
-    });
+    let payload = [
+      { from: 1, to: 2 },
+      { from: 2, to: 3 },
+      { from: 3, to: 4 },
+      { from: 4, to: 5 },
+      { from: 5, to: 100 }
+    ][timeLength];
     this.props.dispatch({
-      type: "financial/refreshData"
+      type: "financial/refreshData",
+      payload
     });
   };
+
+  componentDidMount() {
+    this.queryData();
+  }
 
   render() {
     const marks = {
@@ -66,7 +77,7 @@ class InvComponent extends React.Component {
             defaultValue={this.state.timeLength}
             min={0}
             max={4}
-            tipFormatter={idx => (idx === 4 ? "5年以上" : marks[idx])}
+            tipFormatter={idx => this.state.timeDesc[idx]}
             onAfterChange={timeLength => this.setState({ timeLength })}
           />
         </div>
@@ -84,9 +95,7 @@ class InvComponent extends React.Component {
         <ul>
           <li>
             <span>呆滞距今时间：</span>
-            <div>
-              {this.state.statType === "1" ? "期初至今" : "本期年初至今"}
-            </div>
+            <div>{this.state.timeDesc[this.state.timeLength]}</div>
           </li>
         </ul>
       </div>
@@ -104,12 +113,12 @@ class InvComponent extends React.Component {
             <td
               key={keyTd}
               style={{
-                textAlign: [2, 3, 4, 5, 7, 8, 10, 11].includes(keyTd)
-                  ? "right"
-                  : "left"
+                textAlign: [3, 4, 6, 7].includes(keyTd) ? "right" : "left"
               }}
             >
-              {td}
+              {!R.isNil(td) && [3, 4, 6, 7].includes(keyTd)
+                ? lib.thouandsNum(td)
+                : td}
             </td>
           ))}
         </tr>
@@ -171,7 +180,11 @@ class InvComponent extends React.Component {
                 </th>
               </tr>
             </thead>
-            <TableBody />
+            {this.props.loading ? (
+              <LoadingComponent colSpan="10" />
+            ) : (
+              <TableBody />
+            )}
           </table>
           <div className={styles.action}>
             <Button
