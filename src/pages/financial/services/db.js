@@ -17,7 +17,7 @@ const API = {
   EXCESS_INV: DEV ? LOCAL + '117dd652a7_inv_alanysis.json' : SERV + '155/117dd652a7/array.html',
   IF_REMAIN: DEV ? LOCAL + '713e3e1011_invSub.json' : SERV + '154/713e3e1011.html',
   IF_IOS_COMBINE: DEV ? LOCAL + '4653126720_ios_combine.json' : SERV + '156/4653126720.html',
-  ORG_LIST: LOCAL + '5f830d1833_org.json'
+  ORG_LIST: DEV ? LOCAL + '5f830d1833_org.json' : SERV + '157/5f830d1833.html'
 };
 
 export const getOrgList = async () => await axios({
