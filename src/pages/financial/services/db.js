@@ -16,8 +16,15 @@ const API = {
   IF_REC: DEV ? LOCAL + "9b089d2e3c_rec.json" : SERV + "153/16a5f99c46.html",
   EXCESS_INV: DEV ? LOCAL + '117dd652a7_inv_alanysis.json' : SERV + '155/117dd652a7/array.html',
   IF_REMAIN: DEV ? LOCAL + '713e3e1011_invSub.json' : SERV + '154/713e3e1011.html',
-  IF_IOS_COMBINE: DEV ? LOCAL + '/4653126720_ios_combine.json' : SERV + '156/4653126720.html',
+  IF_IOS_COMBINE: DEV ? LOCAL + '4653126720_ios_combine.json' : SERV + '156/4653126720.html',
+  ORG_LIST: LOCAL + '5f830d1833_org.json'
 };
+
+export const getOrgList = async () => await axios({
+  url: API.ORG_LIST
+}).then(({
+  data
+}) => data);
 
 export const getPeriodid = async periodName => {
   let url = API.PERIOD_MAXID + "?period=" + periodName;
@@ -47,9 +54,16 @@ export const getPeriodDate = async curDay => {
 /**
 *   @database: { 数管测试库 }
 *   @desc:     { 物料收付存统计查询 } 
-    const { periodid, baseid, sn, name } = params;
+    const { periodid, baseid, sn, name,alias } = params;
 */
 export const getIOSInv = async params => {
+  if (params.alias !== '%%') {
+    return {
+      data: []
+    };
+  }
+
+  Reflect.deleteProperty(params, 'alias');
   return await axios({
     url: API.IF_IOS_COMBINE,
     params,

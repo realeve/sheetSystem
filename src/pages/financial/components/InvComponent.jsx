@@ -22,12 +22,23 @@ class InvComponent extends React.Component {
     this.state = {
       periodName: props.dateRange[1].substr(0, 7),
       statType: "1",
-      orgName: "企划信息部",
+      orgName: "",
       materialSN: "",
       aliasName: "",
-      materialType: true
+      // 物料编码
+      materialType: true,
+      orgList: props.orgList
     };
   }
+
+  componentDidUpdate = ({ orgList }) => {
+    if (R.equals(orgList, this.state.orgList)) {
+      return false;
+    }
+    this.setState({
+      orgList
+    });
+  };
 
   onDateChange = async (dates, dateStrings) => {
     await this.props.dispatch({
@@ -60,7 +71,7 @@ class InvComponent extends React.Component {
   //   option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0;
 
   onChangeMaterialSN = e => {
-    const materialType = /\d*.\d*/.test(e.target.value);
+    const materialType = /^\d+(\.\d+)?$/.test(e.target.value);
     this.setState({
       materialSN: e.target.value,
       materialType
@@ -75,7 +86,14 @@ class InvComponent extends React.Component {
 
   queryData = () => {
     // 必选的输入框无法清除，始终会有数据，故无需做数据校验
-    const { periodName, statType, orgName, materialSN, aliasName } = this.state;
+    const {
+      periodName,
+      statType,
+      orgName,
+      materialSN,
+      aliasName,
+      materialType
+    } = this.state;
     this.props.dispatch({
       type: "financial/refreshData",
       payload: {
@@ -83,14 +101,15 @@ class InvComponent extends React.Component {
         statType,
         orgName,
         materialSN,
-        aliasName
+        aliasName,
+        materialType
       }
     });
   };
 
-  componentDidMount() {
-    this.queryData();
-  }
+  // componentDidMount() {
+  //   this.queryData();
+  // }
 
   render() {
     const QueryHeader = () => {
@@ -136,9 +155,11 @@ class InvComponent extends React.Component {
                 value={this.state.orgName}
                 // filterOption={this.handleOrgFilter}
               >
-                <Option value="企划信息部">企划信息部</Option>
-                <Option value="组织2">组织2</Option>
-                <Option value="组织3">组织3</Option>
+                {this.state.orgList.map(({ k, v }, key) => (
+                  <Option value={k} key={key}>
+                    {v}
+                  </Option>
+                ))}
               </Select>
             </div>
           </Col>
@@ -170,7 +191,11 @@ class InvComponent extends React.Component {
               />
             </div>
             <div className={styles.formItem}>
-              <Button type="primary" onClick={this.queryData}>
+              <Button
+                type="primary"
+                onClick={this.queryData}
+                disabled={this.state.orgName.length === 0}
+              >
                 <Icon type="search" />查询
               </Button>
             </div>
@@ -179,6 +204,13 @@ class InvComponent extends React.Component {
       );
     };
 
+    const getOrgName = () => {
+      let org = this.state.orgList.find(({ k }) => k === this.state.orgName);
+      if (R.isNil(org)) {
+        return "";
+      }
+      return org.v;
+    };
     const TableTitle = () => (
       <div className={styles.head}>
         <h2>物料收付存统计查询</h2>
@@ -195,7 +227,7 @@ class InvComponent extends React.Component {
           </li>
           <li>
             <span>库存组织：</span>
-            <div>{this.state.orgName}</div>
+            <div>{getOrgName()}</div>
           </li>
           {this.state.materialSN.length > 0 && (
             <li>
