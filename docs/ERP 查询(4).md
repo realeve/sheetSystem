@@ -69,6 +69,9 @@
     --AND t.INVENTORY_ITEM_ID = 4
     GROUP BY t.SN, t.NAME, t.DESCRIPTION;
     ```
+7.	接口5（数据库连接1）：ERP主组织代码
+	http://10.8.1.25:100/api/157/5f830d1833.html
+	
 
 ## 呆滞库存分析
 
