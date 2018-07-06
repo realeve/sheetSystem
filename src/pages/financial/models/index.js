@@ -8,6 +8,7 @@ export default {
   state: {
     dateRange: [],
     dataSource: [],
+    orgList: [],
     router: ''
   },
   reducers: {
@@ -20,6 +21,18 @@ export default {
     }
   },
   effects: {
+    * getOrgList(payload, {
+      call,
+      put
+    }) {
+      let orgList = yield call(db.getOrgList);
+      yield put({
+        type: 'setStore',
+        payload: {
+          orgList
+        }
+      })
+    },
     * refreshData({
       payload
     }, {
@@ -39,7 +52,8 @@ export default {
             materialSN,
             orgName,
             periodName,
-            statType
+            statType,
+            materialType
           } = payload;
 
           let period;
@@ -65,14 +79,16 @@ export default {
             periodid: curId,
             baseid,
             orgName,
-            name: aliasName.length === 0 ? '%%' : `%${aliasName}%`,
-            sn: materialSN.length === 0 ? '%%' : `%${materialSN}%`
+            alias: aliasName.length === 0 ? '%%' : `%${aliasName}%`,
+            sn: materialType && materialSN.length > 0 ? `%${materialSN}%` : '%%',
+            name: !materialType && materialSN.length > 0 ? `%${materialSN}%` : '%%',
           });
 
-          console.log(dataSource);
-
-          // 合并行级
-          dataSource.data = db.handleInvData(dataSource.data);
+          if (dataSource.data.length) {
+            // console.log(dataSource);
+            // 合并行级
+            dataSource.data = db.handleInvData(dataSource.data);
+          }
           break;
         case '/excess':
           // 当前时间
@@ -114,6 +130,10 @@ export default {
             router
           }
         });
+
+        dispatch({
+          type: 'getOrgList'
+        })
       });
     }
   }
