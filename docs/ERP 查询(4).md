@@ -129,80 +129,57 @@
 
 # 收付存 20180705
 
-http://10.8.1.25:100/api/156/4653126720.html?baseid=3700&periodid=3796&sn=%254101%25&name=%25%E4%BA%94%E9%87%91%25
+http://10.8.1.25:100/api/156/4653126720.html?periodid=3829&baseid=3519&sn=%25%25&name=%25墨%25&orgid=27
 
 ```sql
-with tmp_tbl as (select 3796 as m_id,3722 as base_id,'%4101%' m_sn,'%%' as m_name from dual)
-SELECT
-	SN "sn",
-	NAME "name",
-	SUM (QUANTITY) "quantity",
-	ROUND (SUM(FIGURE), 2) "figure",
-	'' "remark",
-	'0' "type"
-FROM
-	TBERP_INV_PERIOD a inner join tmp_tbl b
-on
-	MAX_ID <= b.base_id
-AND (QUANTITY > 0 OR FIGURE > 0)
-AND sn LIKE b.m_sn
-AND NAME LIKE b.m_name
-GROUP BY
-	SN,
-	NAME
+with tmp_tbl as
+ (select distinct 3829 as m_id, 3519 as base_id,p.inventory_item_id,p.sn m_sn,p.name m_name from tberp_inv_period p where p.sn like '%%' and p.name like '%墨%' and p.organization_id=27)
+SELECT a.SN "sn",
+       a.NAME "name",
+       SUM(a.QUANTITY) "quantity",
+       ROUND(SUM(a.FIGURE), 2) "figure",
+       '' "remark",
+       '0' "type"
+  FROM TBERP_INV_PERIOD a
+ inner join tmp_tbl b
+    on a.MAX_ID <= b.base_id
+   AND (a.QUANTITY > 0 OR a.FIGURE > 0)
+   AND a.sn = b.m_sn
+ GROUP BY a.SN, a.NAME
 union
-SELECT
-	T .SN "sn",
-	T . NAME "name",
-	SUM (T .QUANTITY) "quantity",
-	SUM (T .figure) "figure",
-	T .TRANSACTION_TYPE_NAME "remark",
-	'1' "type"
-FROM
-	TBERP_INV_INCOME T inner join tmp_tbl b
-on
-	MAX_ID <= b.m_id
-AND sn LIKE b.m_sn
-AND NAME LIKE b.m_name
-GROUP BY
-	T .SN,
-	T . NAME,
-	T .TRANSACTION_TYPE_NAME
+SELECT T.SN "sn",
+       T . NAME "name",
+       SUM(T.QUANTITY) "quantity",
+       SUM(T.figure) "figure",
+       T.TRANSACTION_TYPE_NAME "remark",
+       '1' "type"
+  FROM TBERP_INV_INCOME T
+ inner join tmp_tbl b
+    on MAX_ID <= b.m_id AND sn = b.m_sn
+ GROUP BY T.SN, T . NAME, T.TRANSACTION_TYPE_NAME
 union
-SELECT
-	T .SN "sn",
-	T . NAME "name",
-	SUM (T .QUANTITY) "quantity",
-	SUM (T .figure) "figure",
-	T .DESCRIPTION "remark",
-	'2' "type"
-FROM
-	TBERP_INV_PAYOUT T inner join tmp_tbl b
-on
-	MAX_ID <= b.m_id
-AND sn LIKE b.m_sn
-AND NAME LIKE b.m_name
-GROUP BY
-	T .SN,
-	T . NAME,
-	T .DESCRIPTION
+SELECT T.SN "sn",
+       T . NAME "name",
+       SUM(T.QUANTITY) "quantity",
+       SUM(T.figure) "figure",
+       T.DESCRIPTION "remark",
+       '2' "type"
+  FROM TBERP_INV_PAYOUT T
+ inner join tmp_tbl b
+    on MAX_ID <= b.m_id 
+    AND sn = b.m_sn 
+ GROUP BY T.SN, T . NAME, T.DESCRIPTION
 union
-SELECT
-	SN "sn",
-	NAME "name",
-	SUM (QUANTITY) "quantity",
-	ROUND (SUM(FIGURE), 2) "figure",
-	DESCRIPTION "remark",
-	'3' "type"
-FROM
-	TBERP_INV_PERIOD inner join tmp_tbl b
-on
-	MAX_ID <= b.m_id
-AND sn LIKE b.m_sn
-AND NAME LIKE b.m_name
-AND (QUANTITY > 0 OR FIGURE > 0)
-GROUP BY
-	SN,
-	NAME,
-	DESCRIPTION
+SELECT e.SN "sn",
+       e.NAME "name",
+       SUM(e.QUANTITY) "quantity",
+       ROUND(SUM(e.FIGURE), 2) "figure",
+       e.DESCRIPTION "remark",
+       '3' "type"
+  FROM TBERP_INV_PERIOD e
+ inner join tmp_tbl b
+    on MAX_ID <= b.m_id 
+    AND e.sn = b.m_sn 
+    AND (e.QUANTITY > 0 OR e.FIGURE > 0)
+ GROUP BY e.SN, e.NAME, e.DESCRIPTION
 ```
