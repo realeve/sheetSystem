@@ -1,0 +1,95 @@
+@-webkit-keyframes card-loading {
+  0%,
+  to {
+    background-position: 0 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes card-loading {
+  0%,
+  to {
+    background-position: 0 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.sket-bg {
+  animation: card-loading 1.5s ease infinite;
+  border-radius: 4px;
+  background: linear-gradient(
+    90deg,
+    rgba(207, 216, 220, 0.2),
+    rgba(207, 216, 220, 0.4),
+    rgba(207, 216, 220, 0.2)
+  );
+  background-size: 600% 600%;
+}
+
+.skeleton {
+  margin-top: 20px;
+  font-size: 10.5pt;
+  background: #fff;
+  border-radius: 3px;
+  padding: 30px;
+  .head {
+    width: 100%;
+    margin-bottom: 15px;
+    .title {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      div {
+        .sket-bg;
+        width: 240px;
+        height: 30pt;
+      }
+    }
+    ul {
+      padding-left: 0;
+      li {
+        margin-bottom: 5px;
+        display: flex;
+        height: 22px;
+        span {
+          .sket-bg;
+          font-weight: bold;
+          width: 70px;
+          margin-right: 5px;
+        }
+        div {
+          .sket-bg;
+          width: 170px;
+          padding-left: 10px;
+          padding-right: 10px;
+        }
+      }
+    }
+  }
+
+  .table {
+    width: 100%;
+    margin-bottom: 10px;
+    p {
+      .sket-bg;
+      width: 100%;
+      margin-bottom: 5px;
+      height: 20px;
+    }
+    p:first-child {
+      height: 65px;
+    }
+  }
+
+  .button {
+    width: 117px;
+    height: 32px;
+    .sket-bg;
+  }
+}

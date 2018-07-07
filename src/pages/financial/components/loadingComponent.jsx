@@ -1,19 +1,46 @@
 import React, { Component } from "react";
-import { Icon } from "antd";
+import skeleton from "./skeleton.less";
 
 export default class loadingComponent extends Component {
+  LiComponent = () => {
+    let arr = [];
+    for (let i = 0; i < this.props.queryList; i++) {
+      arr.push(
+        <li>
+          <span />
+          <div />
+        </li>
+      );
+    }
+    return arr;
+  };
+  SkeletonComponent = () => (
+    <div className={skeleton.skeleton}>
+      <div className={skeleton.head}>
+        <div className={skeleton.title}>
+          <div> </div>
+        </div>
+        <ul>
+          <this.LiComponent />
+        </ul>
+      </div>
+      <div className={skeleton.table}>
+        <p />
+        <p />
+        <p />
+        <p />
+        <p />
+        <p />
+        <p />
+        <p />
+        <p />
+        <p />
+      </div>
+      <div className={skeleton.button} />
+    </div>
+  );
+
   render() {
-    return (
-      <tbody>
-        <tr>
-          <td
-            colSpan={this.props.colSpan}
-            style={{ textAlign: "center", fontSize: "14pt" }}
-          >
-            <Icon type="loading" /> 数据加载中...
-          </td>
-        </tr>
-      </tbody>
-    );
+    return <this.SkeletonComponent />;
   }
 }

@@ -15,7 +15,8 @@ class InvComponent extends React.Component {
     super(props);
     this.state = {
       timeLength: 3,
-      timeDesc: ["1-2年", "2-3年", "3-4年", "4-5年", "5年以上"]
+      timeDesc: ["1-2年", "2-3年", "3-4年", "4-5年", "5年以上"],
+      loaded: false
     };
   }
 
@@ -26,6 +27,7 @@ class InvComponent extends React.Component {
   };
 
   queryData = () => {
+    this.setState({ loaded: true });
     // 必选的输入框无法清除，始终会有数据，故无需做数据校验
     const { timeLength } = this.state;
     let payload = [
@@ -135,68 +137,69 @@ class InvComponent extends React.Component {
             <QueryHeader />
           </div>
         </div>
-        <div className={styles.pdfContainer}>
-          <TableTitle />
-          <table>
-            <thead>
-              <tr>
-                <th rowSpan="2">
-                  <span>物料编码</span>
-                </th>
-                <th rowSpan="2">
-                  <span>物料名称</span>
-                </th>
-                <th colSpan="4">
-                  <span>末次收发情况</span>
-                </th>
-                <th colSpan="3">
-                  <span>当前结存</span>
-                </th>
-                <th rowSpan="2">
-                  <span>呆滞时长</span>
-                </th>
-              </tr>
-              <tr>
-                <th>
-                  <span>事务处理类型</span>
-                </th>
-                <th>
-                  <span>数量</span>
-                </th>
-                <th>
-                  <span>金额</span>
-                </th>
-                <th>
-                  <span>来源/帐户</span>
-                </th>
-                <th>
-                  <span>数量</span>
-                </th>
-                <th>
-                  <span>金额</span>
-                </th>
-                <th>
-                  <span>子库</span>
-                </th>
-              </tr>
-            </thead>
-            {this.props.loading ? (
-              <LoadingComponent colSpan="10" />
-            ) : (
-              <TableBody />
-            )}
-          </table>
-          <div className={styles.action}>
-            <Button
-              type="primary"
-              onClick={() => {
-                window.print();
-              }}
-            >
-              打印报表 <Icon type="printer" />
-            </Button>
-          </div>
-        </div>
+        {this.state.loaded &&
+          this.props.loading && <LoadingComponent queryList="1" />}
+        {this.state.loaded &&
+          !this.props.loading && (
+            <div className={styles.pdfContainer}>
+              <TableTitle />
+              <table>
+                <thead>
+                  <tr>
+                    <th rowSpan="2">
+                      <span>物料编码</span>
+                    </th>
+                    <th rowSpan="2">
+                      <span>物料名称</span>
+                    </th>
+                    <th colSpan="4">
+                      <span>末次收发情况</span>
+                    </th>
+                    <th colSpan="3">
+                      <span>当前结存</span>
+                    </th>
+                    <th rowSpan="2">
+                      <span>呆滞时长</span>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th>
+                      <span>事务处理类型</span>
+                    </th>
+                    <th>
+                      <span>数量</span>
+                    </th>
+                    <th>
+                      <span>金额</span>
+                    </th>
+                    <th>
+                      <span>来源/帐户</span>
+                    </th>
+                    <th>
+                      <span>数量</span>
+                    </th>
+                    <th>
+                      <span>金额</span>
+                    </th>
+                    <th>
+                      <span>子库</span>
+                    </th>
+                  </tr>
+                </thead>
+                <TableBody />
+              </table>
+              <div className={styles.action}>
+                <Button
+                  type="primary"
+                  onClick={() => {
+                    window.print();
+                  }}
+                >
+                  打印报表 <Icon type="printer" />
+                </Button>
+              </div>
+            </div>
+          )}
       </>
     );
   }
