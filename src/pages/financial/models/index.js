@@ -67,7 +67,7 @@ export default {
           } else {
             // 本期年初至今
             let [year] = periodName.split('-');
-            period = moment(`12-${parseInt(year, 10) - 1}`, 'MM-YYYY').formar("MM-YY");
+            period = moment(`12-${parseInt(year, 10) - 1}`, 'MM-YYYY').format("MM-YY");
           }
           let curPeriodName = moment(periodName, "YYYY-MM").format("MM-YY");
           // 期初情况(基础数据)
