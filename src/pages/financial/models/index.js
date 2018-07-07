@@ -15,7 +15,8 @@ export default {
     setStore(state, {
       payload
     }) {
-      return { ...state,
+      return {
+        ...state,
         ...payload
       };
     }
@@ -61,24 +62,24 @@ export default {
           // 期初至今
           if (statType === '0') {
             period = moment(periodName, "YYYY-MM")
-              .subtract(1, "month")
+              .subtract(1, "months")
               .format("MM-YY");
           } else {
             // 本期年初至今
             let [year] = periodName.split('-');
-            period = `12-${parseInt(year,10)-1}`;
+            period = moment(`12-${parseInt(year, 10) - 1}`, 'MM-YYYY').formar("MM-YY");
           }
+          let curPeriodName = moment(periodName, "YYYY-MM").format("MM-YY");
           // 期初情况(基础数据)
           const baseid = yield call(db.getPeriodid, period);
           // 当期收付存id
-          const curId = yield call(db.getPeriodid, periodName);
-
+          const curId = yield call(db.getPeriodid, curPeriodName);
           // 传入sn及name参数，减少数据行级。
           // dataSource = yield call(db.getPeriodInv, {
           dataSource = yield call(db.getIOSInv, {
             periodid: curId,
             baseid,
-            orgName,
+            orgid: orgName,
             alias: aliasName.length === 0 ? '%%' : `%${aliasName}%`,
             sn: materialType && materialSN.length > 0 ? `%${materialSN}%` : '%%',
             name: !materialType && materialSN.length > 0 ? `%${materialSN}%` : '%%',
@@ -92,7 +93,7 @@ export default {
           break;
         case '/excess':
           // 当前时间
-          payload.period = moment().format("MM-YY");
+          payload.periodid = yield call(db.getPeriodid, moment().format("MM-YY"));
           dataSource = yield call(db.getExcess, payload);
           break;
         default:
