@@ -155,9 +155,9 @@ class InvComponent extends React.Component {
                 value={this.state.orgName}
                 // filterOption={this.handleOrgFilter}
               >
-                {this.state.orgList.map(({ k, v }, key) => (
-                  <Option value={k} key={key}>
-                    {v}
+                {this.state.orgList.map(({ name, value }, key) => (
+                  <Option value={value} key={key}>
+                    {name}
                   </Option>
                 ))}
               </Select>
@@ -205,11 +205,13 @@ class InvComponent extends React.Component {
     };
 
     const getOrgName = () => {
-      let org = this.state.orgList.find(({ k }) => k === this.state.orgName);
+      let org = this.state.orgList.find(
+        ({ value }) => value === this.state.orgName
+      );
       if (R.isNil(org)) {
         return "";
       }
-      return org.v;
+      return org.name;
     };
     const TableTitle = () => (
       <div className={styles.head}>
