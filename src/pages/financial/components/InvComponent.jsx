@@ -6,6 +6,7 @@ import * as lib from "../../../utils/lib";
 import LoadingComponent from "./loadingComponent";
 
 import styles from "./inv.less";
+
 import moment from "moment";
 import "moment/locale/zh-cn";
 moment.locale("zh-cn");
@@ -27,7 +28,8 @@ class InvComponent extends React.Component {
       aliasName: "",
       // 物料编码
       materialType: true,
-      orgList: props.orgList
+      orgList: props.orgList,
+      loaded: false
     };
   }
 
@@ -85,6 +87,7 @@ class InvComponent extends React.Component {
   };
 
   queryData = () => {
+    this.setState({ loaded: true });
     // 必选的输入框无法清除，始终会有数据，故无需做数据校验
     const {
       periodName,
@@ -397,83 +400,84 @@ class InvComponent extends React.Component {
             <QueryHeader />
           </div>
         </div>
-        <div className={styles.pdfContainer}>
-          <TableTitle />
-          <table>
-            <thead>
-              <tr>
-                <th rowSpan="2">
-                  <span>物料编码</span>
-                </th>
-                <th rowSpan="2" width="160">
-                  <span>物料名称</span>
-                </th>
-                <th colSpan="2">
-                  <span>期初情况</span>
-                </th>
-                <th colSpan="3">
-                  <span>收入情况</span>
-                </th>
-                <th colSpan="3">
-                  <span>发出情况</span>
-                </th>
-                <th colSpan="3">
-                  <span>结存情况</span>
-                </th>
-              </tr>
-              <tr>
-                <th>
-                  <span>数量</span>
-                </th>
-                <th>
-                  <span>金额</span>
-                </th>
-                <th>
-                  <span>数量</span>
-                </th>
-                <th>
-                  <span>金额</span>
-                </th>
-                <th width="70">
-                  <span>来源</span>
-                </th>
-                <th>
-                  <span>数量</span>
-                </th>
-                <th>
-                  <span>金额</span>
-                </th>
-                <th width="70">
-                  <span>帐户别名</span>
-                </th>
-                <th>
-                  <span>数量</span>
-                </th>
-                <th>
-                  <span>金额</span>
-                </th>
-                <th width="70">
-                  <span>子库名称</span>
-                </th>
-              </tr>
-            </thead>
-            {this.props.loading ? (
-              <LoadingComponent colSpan="13" />
-            ) : (
-              <TableBody />
-            )}
-          </table>
-          <div className={styles.action}>
-            <Button
-              type="primary"
-              onClick={() => {
-                window.print();
-              }}
-            >
-              打印报表 <Icon type="printer" />
-            </Button>
-          </div>
-        </div>
+        {this.state.loaded &&
+          this.props.loading && <LoadingComponent queryList="3" />}
+        {this.state.loaded &&
+          !this.props.loading && (
+            <div className={styles.pdfContainer}>
+              <TableTitle />
+              <table>
+                <thead>
+                  <tr>
+                    <th rowSpan="2">
+                      <span>物料编码</span>
+                    </th>
+                    <th rowSpan="2" width="160">
+                      <span>物料名称</span>
+                    </th>
+                    <th colSpan="2">
+                      <span>期初情况</span>
+                    </th>
+                    <th colSpan="3">
+                      <span>收入情况</span>
+                    </th>
+                    <th colSpan="3">
+                      <span>发出情况</span>
+                    </th>
+                    <th colSpan="3">
+                      <span>结存情况</span>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th>
+                      <span>数量</span>
+                    </th>
+                    <th>
+                      <span>金额</span>
+                    </th>
+                    <th>
+                      <span>数量</span>
+                    </th>
+                    <th>
+                      <span>金额</span>
+                    </th>
+                    <th width="70">
+                      <span>来源</span>
+                    </th>
+                    <th>
+                      <span>数量</span>
+                    </th>
+                    <th>
+                      <span>金额</span>
+                    </th>
+                    <th width="70">
+                      <span>帐户别名</span>
+                    </th>
+                    <th>
+                      <span>数量</span>
+                    </th>
+                    <th>
+                      <span>金额</span>
+                    </th>
+                    <th width="70">
+                      <span>子库名称</span>
+                    </th>
+                  </tr>
+                </thead>
+                <TableBody />
+              </table>
+              <div className={styles.action}>
+                <Button
+                  type="primary"
+                  onClick={() => {
+                    window.print();
+                  }}
+                >
+                  打印报表 <Icon type="printer" />
+                </Button>
+              </div>
+            </div>
+          )}
       </>
     );
   }
