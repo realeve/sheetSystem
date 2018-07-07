@@ -3,13 +3,14 @@ import Link from "umi/link";
 
 import { Layout } from "antd";
 import styles from "./header.less";
+import LoginAvatar from "./LoginAvatar";
 
 const { Header } = Layout;
 
-function HeaderMenu({ location }) {
+function HeaderMenu({ location, avatar }) {
   return (
     <Header className={styles.header}>
-      <div className={styles.logo}>报表系统</div>
+      <div className={styles.logo}>财务报表系统</div>
       <Menu
         selectedKeys={[location.pathname]}
         mode="horizontal"
@@ -27,6 +28,7 @@ function HeaderMenu({ location }) {
           </Link>
         </Menu.Item>
       </Menu>
+      <LoginAvatar avatar={avatar} />
     </Header>
   );
 }

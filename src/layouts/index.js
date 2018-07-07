@@ -1,12 +1,14 @@
 import React, { Component } from "react";
+import { connect } from "dva";
 
-import "ant-design-pro/dist/ant-design-pro.css"; // 统一引入样式
+import "ant-design-pro/dist/ant-design-pro.css";
 
 import styles from "./index.less";
 import Header from "./Header";
-import withRouter from "umi/withRouter";
 
-import { Layout, Breadcrumb } from "antd";
+import { TransitionGroup, CSSTransition } from "react-transition-group";
+
+import { Layout, Breadcrumb, BackTop } from "antd";
 const { Content, Footer } = Layout;
 
 class Index extends Component {
@@ -37,18 +39,40 @@ class Index extends Component {
   }
 
   render() {
-    const { location, children } = this.props;
+    const { location, children, userSetting } = this.props;
+    if (location.pathname === "/login") {
+      return (
+        <TransitionGroup>
+          <CSSTransition
+            key={location.key}
+            classNames="fade"
+            timeout={{ enter: 1200, exit: 300 }}
+          >
+            {children}
+          </CSSTransition>
+        </TransitionGroup>
+      );
+    }
 
     return (
       <Layout className={styles.main}>
-        <Header location={location} />
-        <Content className={styles.container}>
-          <Breadcrumb className={styles.breadCrumb}>
-            <Breadcrumb.Item>主页</Breadcrumb.Item>
-            <Breadcrumb.Item>{this.state.curPageName}</Breadcrumb.Item>
-          </Breadcrumb>
-          <div className={styles.content}>{children}</div>
-        </Content>
+        <Header location={location} avatar={userSetting} />
+        <TransitionGroup>
+          <CSSTransition
+            key={location.key}
+            classNames="ani-left"
+            timeout={{ enter: 400, exit: 300 }}
+          >
+            <Content className={styles.container}>
+              <Breadcrumb className={styles.breadCrumb}>
+                <Breadcrumb.Item>主页</Breadcrumb.Item>
+                <Breadcrumb.Item>{this.state.curPageName}</Breadcrumb.Item>
+              </Breadcrumb>
+              <div className={styles.content}>{children}</div>
+            </Content>
+          </CSSTransition>
+        </TransitionGroup>
+        <BackTop />
         <Footer className={styles.footer}>
           cbpc ©2018 All rights reserved.
         </Footer>
@@ -57,4 +81,10 @@ class Index extends Component {
   }
 }
 
-export default withRouter(Index);
+function mapStateToProps(state) {
+  return {
+    ...state.common
+  };
+}
+
+export default connect(mapStateToProps)(Index);
