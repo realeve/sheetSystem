@@ -31,7 +31,7 @@ export const getPeriodid = async periodName => {
   let data = await axios({
     url
   })
-  return data.rows === 1 ? data.data[0].PERIODID : -1;
+  return data.rows === 1 ? data.data[0].periodId : -1;
 };
 
 /**
@@ -68,7 +68,7 @@ export const getIOSInv = async params => {
     url: API.IF_IOS_COMBINE,
     params,
   }).then(res => {
-    res.data = res.data.slice(0, 500);
+    // res.data = res.data.slice(0, 500);
     return res;
   });
 }
