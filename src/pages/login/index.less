@@ -1,8 +1,8 @@
 .container {
   overflow: auto;
-  background-image: url(/img/bg.jpg);
+  background-image: url(/img/5.jpg);
   background-size: cover;
-  background-position: top center;
+  background-position: center center;
 
   &::after {
     background: linear-gradient(
@@ -70,7 +70,7 @@
       box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14),
         0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.2);
       padding: 40px 75px 75px 75px;
-      background: #fff;
+      background: rgba(255, 255, 255, 0.25);
       border-radius: 6px;
       position: relative;
       margin-top: 50px;
@@ -80,6 +80,12 @@
         font-size: 2.25rem;
         line-height: 1.5em;
         font-weight: lighter;
+        color: #fff;
+      }
+
+      a {
+        text-decoration: underline;
+        color: #fff;
       }
 
       @avatar-size: 80px;
