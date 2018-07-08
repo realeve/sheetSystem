@@ -7,11 +7,12 @@ import "ant-design-pro/dist/ant-design-pro.css";
 
 import styles from "./index.less";
 import Header from "./Header";
-
+import {DEV} from '../utils/axios';
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 
 import { Layout, Breadcrumb, BackTop } from "antd";
 const { Content, Footer } = Layout;
+
 
 class Index extends Component {
   constructor(props) {
@@ -24,6 +25,9 @@ class Index extends Component {
 
   // handle login
   handleLoginLogic() {
+    if(DEV){
+      return;
+    }
     let { data, success } = userTool.getUserSetting();
     if (!success || !data.autoLogin) {
       router.push("/login");

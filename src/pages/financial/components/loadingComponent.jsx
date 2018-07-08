@@ -6,7 +6,7 @@ export default class loadingComponent extends Component {
     let arr = [];
     for (let i = 0; i < this.props.queryList; i++) {
       arr.push(
-        <li>
+        <li key={i}>
           <span />
           <div />
         </li>
