@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "dva";
+import router from "umi/router";
+import userTool from "../utils/users";
 
 import "ant-design-pro/dist/ant-design-pro.css";
 
@@ -17,8 +19,23 @@ class Index extends Component {
     this.state = {
       curPageName: ""
     };
+    this.handleLoginLogic();
   }
 
+  // handle login
+  handleLoginLogic() {
+    let { data, success } = userTool.getUserSetting();
+    if (!success || !data.autoLogin) {
+      router.push("/login");
+      return;
+    }
+    this.props.dispatch({
+      type: "common/setStore",
+      payload: {
+        userSetting: data.setting
+      }
+    });
+  }
   // 组件加载前更新菜单ID
   componentDidMount() {
     const { pathname } = this.props.location;
