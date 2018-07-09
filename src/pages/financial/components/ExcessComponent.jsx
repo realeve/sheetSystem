@@ -43,9 +43,9 @@ class InvComponent extends React.Component {
     });
   };
 
-  componentDidMount() {
-    this.queryData();
-  }
+  // componentDidMount() {
+  //   this.queryData();
+  // }
 
   render() {
     const marks = {

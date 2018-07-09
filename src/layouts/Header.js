@@ -17,7 +17,7 @@ function HeaderMenu({ location, avatar }) {
         theme="dark"
         className={styles.menu}
       >
-        <Menu.Item key="/table">
+        {/* <Menu.Item key="/table">
           <Link to="/table">
             <Icon type="table" />报表
           </Link>
@@ -25,6 +25,16 @@ function HeaderMenu({ location, avatar }) {
         <Menu.Item key="/chart">
           <Link to="/chart">
             <Icon type="area-chart" />图表
+          </Link>
+        </Menu.Item> */}
+        <Menu.Item key="/financial/inv">
+          <Link to="/financial/inv">
+            <Icon type="table" />收付存报表
+          </Link>
+        </Menu.Item>
+        <Menu.Item key="/financial/excess">
+          <Link to="/financial/excess">
+            <Icon type="area-chart" />呆滞库存分析
           </Link>
         </Menu.Item>
       </Menu>
