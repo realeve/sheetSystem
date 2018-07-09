@@ -3,7 +3,7 @@ import { connect } from "dva";
 import { DatePicker, Button, Icon, Row, Col } from "antd";
 import { Radio, Select, Input } from "antd";
 import * as lib from "../../../utils/lib";
-import LoadingComponent from "./loadingComponent";
+import LoadingComponent from "./LoadingComponent";
 
 import styles from "./inv.less";
 

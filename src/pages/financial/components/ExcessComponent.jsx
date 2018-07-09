@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from "dva";
 import { Button, Icon, Slider } from "antd";
 import * as lib from "../../../utils/lib";
-import LoadingComponent from "./loadingComponent";
+import LoadingComponent from "./LoadingComponent";
 import styles from "./inv.less";
 import moment from "moment";
 import "moment/locale/zh-cn";
