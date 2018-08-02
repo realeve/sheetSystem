@@ -110,6 +110,18 @@ class InvComponent extends React.Component {
     });
   };
 
+  reset = () => {
+    this.setState({
+      statType: "1",
+      orgName: "",
+      materialSN: "",
+      aliasName: "",
+      materialType: true,
+      orgList: this.props.orgList,
+      loaded: false
+    });
+  };
+
   // componentDidMount() {
   //   this.queryData();
   // }
@@ -134,19 +146,6 @@ class InvComponent extends React.Component {
             </div>
             <div className={styles.formItem}>
               <label className={[styles.formLabel, styles.required].join(" ")}>
-                统计类型:
-              </label>
-              <RadioGroup
-                className={styles.radioButton}
-                defaultValue={this.state.statType}
-                onChange={this.handleStatTypeChange}
-              >
-                <RadioButton value="0">期初至今</RadioButton>
-                <RadioButton value="1">本期年初至今</RadioButton>
-              </RadioGroup>
-            </div>
-            <div className={styles.formItem}>
-              <label className={[styles.formLabel, styles.required].join(" ")}>
                 库存组织:
               </label>
               <Select
@@ -165,10 +164,35 @@ class InvComponent extends React.Component {
                 ))}
               </Select>
             </div>
+            <div className={styles.formItem}>
+              <label className={[styles.formLabel, styles.required].join(" ")}>帐户别名:</label>
+              <Input
+                placeholder="输入帐户别名"
+                prefix={
+                  <Icon type="team" style={{ color: "rgba(0,0,0,.25)" }} />
+                }
+                defaultValue={this.state.aliasName}
+                onBlur={this.onChangeAliasName}
+                className={styles.formContainer}
+              />
+            </div>
           </Col>
           <Col span={12}>
+            <div className={styles.formItem}>
+              <label className={[styles.formLabel, styles.required].join(" ")}>
+                统计类型:
+              </label>
+              <RadioGroup
+                className={styles.radioButton}
+                defaultValue={this.state.statType}
+                onChange={this.handleStatTypeChange}
+              >
+                <RadioButton value="0">期初至今</RadioButton>
+                <RadioButton value="1">本期年初至今</RadioButton>
+              </RadioGroup>
+            </div>
             <div className={[styles.formItem, styles.formAction].join(" ")}>
-              <label className={styles.formLabel}>
+              <label className={[styles.formLabel, styles.required].join(" ")}>
                 {this.state.materialType ? "物料编码" : "物料名称 "}:
               </label>
               <Input
@@ -182,24 +206,18 @@ class InvComponent extends React.Component {
               />
             </div>
             <div className={styles.formItem}>
-              <label className={styles.formLabel}>帐户别名:</label>
-              <Input
-                placeholder="输入帐户别名"
-                prefix={
-                  <Icon type="team" style={{ color: "rgba(0,0,0,.25)" }} />
-                }
-                defaultValue={this.state.aliasName}
-                onBlur={this.onChangeAliasName}
-                className={styles.formContainer}
-              />
-            </div>
-            <div className={styles.formItem}>
               <Button
                 type="primary"
                 onClick={this.queryData}
-                disabled={this.state.orgName.length === 0}
+                disabled={this.state.orgName.length*this.state.materialSN.length===0 && this.state.aliasName.length === 0}
               >
                 <Icon type="search" />查询
+              </Button>
+              <Button
+                type="primary"
+                onClick={this.reset} style={{"marginLeft":"2em"}}
+              >
+                <Icon type="search" />重置
               </Button>
             </div>
           </Col>
@@ -395,7 +413,7 @@ class InvComponent extends React.Component {
     return (
       <>
         <div className={styles.card}>
-          <div className={styles.title}>查询条件</div>
+          <div className={styles.title}>查询条件<span>(需选择：库存组织+物料编码 or 账户别名)</span></div>
           <div className={styles.header}>
             <QueryHeader />
           </div>
