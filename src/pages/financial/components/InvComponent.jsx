@@ -18,6 +18,8 @@ const Option = Select.Option;
 const R = require("ramda");
 
 class InvComponent extends React.Component {
+  // queryMode 0 means query by orgname and sn of materialsn;
+  // queryMode 1 means query by disaccount .
   constructor(props) {
     super(props);
     this.state = {
@@ -29,7 +31,8 @@ class InvComponent extends React.Component {
       // 物料编码
       materialType: true,
       orgList: props.orgList,
-      loaded: false
+      loaded: false,
+      queryMode: 0
     };
   }
 
@@ -40,6 +43,11 @@ class InvComponent extends React.Component {
     this.setState({
       orgList
     });
+  };
+
+  chooseMode = e => {
+    this.props.dataSource.data = [];
+    this.setState({ queryMode: e.target.value });
   };
 
   onDateChange = async (dates, dateStrings) => {
@@ -95,7 +103,8 @@ class InvComponent extends React.Component {
       orgName,
       materialSN,
       aliasName,
-      materialType
+      materialType,
+      queryMode
     } = this.state;
     this.props.dispatch({
       type: "financial/refreshData",
@@ -105,7 +114,8 @@ class InvComponent extends React.Component {
         orgName,
         materialSN,
         aliasName,
-        materialType
+        materialType,
+        queryMode
       }
     });
   };
@@ -127,8 +137,82 @@ class InvComponent extends React.Component {
   // }
 
   render() {
+    const HeaderOrgCol0 = () => {
+      return (
+        <div className={styles.formItem}>
+          <label className={[styles.formLabel, styles.required].join(" ")}>
+            库存组织:
+              </label>
+          <Select
+            showSearch
+            className={styles.formContainer}
+            placeholder="选择库存组织"
+            optionFilterProp="children"
+            onChange={this.handleOrgChange}
+            value={this.state.orgName}
+          // filterOption={this.handleOrgFilter}
+          >
+            {this.state.orgList.map(({ k, v, code }) => (
+              <Option value={k} key={code}>
+                {v}
+              </Option>
+            ))}
+          </Select>
+        </div>
+      );
+    };
+
+    const HeaderDisaccCol0 = () => {
+      return (
+        <div className={styles.formItem}>
+          <label className={[styles.formLabel, styles.required].join(" ")}>帐户别名:</label>
+          <Input
+            placeholder="输入帐户别名"
+            prefix={
+              <Icon type="team" style={{ color: "rgba(0,0,0,.25)" }} />
+            }
+            defaultValue={this.state.aliasName}
+            onBlur={this.onChangeAliasName}
+            className={styles.formContainer}
+          />
+        </div>
+      );
+    };
+
+    const HeaderCol0 = (props) => {
+      if (parseInt(props.queryMode, 10) === 1) {
+        return <HeaderDisaccCol0 />;
+      } else {
+        return <HeaderOrgCol0 />;
+      }
+    }
+
+    const HeaderCol1 = (props) => {
+      if (parseInt(props.queryMode, 10) === 1) {
+        return null;
+      } else {
+        return (
+          <div className={[styles.formItem, styles.formAction].join(" ")}>
+            <label className={[styles.formLabel, styles.required].join(" ")}>
+              {this.state.materialType ? "物料编码" : "物料名称 "}:
+              </label>
+            <Input
+              placeholder="输入物料编码/名称"
+              prefix={
+                <Icon type="barcode" style={{ color: "rgba(0,0,0,.25)" }} />
+              }
+              defaultValue={this.state.materialSN}
+              onBlur={this.onChangeMaterialSN}
+              className={styles.formContainer}
+            />
+          </div>
+        );
+      }
+    }
     const QueryHeader = () => {
       const { dateRange } = this.props;
+      const queryValidate = this.state.queryMode === 0 ? (
+        this.state.orgName.length * this.state.materialSN.length === 0) : (this.state.aliasName.length === 0);
       return (
         <Row gutter={8}>
           <Col span={12}>
@@ -144,37 +228,21 @@ class InvComponent extends React.Component {
                 style={{ width: 203 }}
               />
             </div>
+            <HeaderCol0 queryMode={this.state.queryMode} />
             <div className={styles.formItem}>
-              <label className={[styles.formLabel, styles.required].join(" ")}>
-                库存组织:
-              </label>
-              <Select
-                showSearch
-                className={styles.formContainer}
-                placeholder="选择库存组织"
-                optionFilterProp="children"
-                onChange={this.handleOrgChange}
-                value={this.state.orgName}
-                // filterOption={this.handleOrgFilter}
+              <Button
+                type="primary"
+                onClick={this.queryData}
+                disabled={queryValidate}
               >
-                {this.state.orgList.map(({ name, value }, key) => (
-                  <Option value={value} key={key}>
-                    {name}
-                  </Option>
-                ))}
-              </Select>
-            </div>
-            <div className={styles.formItem}>
-              <label className={[styles.formLabel, styles.required].join(" ")}>帐户别名:</label>
-              <Input
-                placeholder="输入帐户别名"
-                prefix={
-                  <Icon type="team" style={{ color: "rgba(0,0,0,.25)" }} />
-                }
-                defaultValue={this.state.aliasName}
-                onBlur={this.onChangeAliasName}
-                className={styles.formContainer}
-              />
+                <Icon type="search" />查询
+              </Button>
+              <Button
+                type="primary"
+                onClick={this.reset} style={{ "marginLeft": "2em" }}
+              >
+                <Icon type="search" />重置
+              </Button>
             </div>
           </Col>
           <Col span={12}>
@@ -191,35 +259,7 @@ class InvComponent extends React.Component {
                 <RadioButton value="1">本期年初至今</RadioButton>
               </RadioGroup>
             </div>
-            <div className={[styles.formItem, styles.formAction].join(" ")}>
-              <label className={[styles.formLabel, styles.required].join(" ")}>
-                {this.state.materialType ? "物料编码" : "物料名称 "}:
-              </label>
-              <Input
-                placeholder="输入物料编码/名称"
-                prefix={
-                  <Icon type="barcode" style={{ color: "rgba(0,0,0,.25)" }} />
-                }
-                defaultValue={this.state.materialSN}
-                onBlur={this.onChangeMaterialSN}
-                className={styles.formContainer}
-              />
-            </div>
-            <div className={styles.formItem}>
-              <Button
-                type="primary"
-                onClick={this.queryData}
-                disabled={this.state.orgName.length*this.state.materialSN.length===0 && this.state.aliasName.length === 0}
-              >
-                <Icon type="search" />查询
-              </Button>
-              <Button
-                type="primary"
-                onClick={this.reset} style={{"marginLeft":"2em"}}
-              >
-                <Icon type="search" />重置
-              </Button>
-            </div>
+            <HeaderCol1 queryMode={this.state.queryMode} />
           </Col>
         </Row>
       );
@@ -227,16 +267,16 @@ class InvComponent extends React.Component {
 
     const getOrgName = () => {
       let org = this.state.orgList.find(
-        ({ value }) => value === this.state.orgName
+        ({ k }) => k === this.state.orgName
       );
-      if (R.isNil(org)) {
-        return "";
+      if (org && org.v) {
+        return org.v;
       }
-      return org.name;
+      return "";
     };
     const TableTitle = () => (
       <div className={styles.head}>
-        <h2>物料收付存统计查询</h2>
+        <h2>物料{this.state.queryMode === 0 ? "收付存" : "账户发放"}统计查询</h2>
         <ul>
           <li>
             <span>查询期间：</span>
@@ -248,11 +288,11 @@ class InvComponent extends React.Component {
               {this.state.statType === "0" ? "期初至今" : "本期年初至今"}
             </div>
           </li>
-          <li>
+          {this.state.queryMode === 0 && (<li>
             <span>库存组织：</span>
             <div>{getOrgName()}</div>
-          </li>
-          {this.state.materialSN.length > 0 && (
+          </li>)}
+          {this.state.queryMode === 0 && (
             <li>
               <span>
                 {this.state.materialType ? "物料编码" : "物料名称 "}：
@@ -261,7 +301,7 @@ class InvComponent extends React.Component {
             </li>
           )}
 
-          {this.state.aliasName.length > 0 && (
+          {this.state.queryMode === 1 && (
             <li>
               <span>帐户别名：</span>
               <div>{this.state.aliasName}</div>
@@ -271,7 +311,122 @@ class InvComponent extends React.Component {
       </div>
     );
 
+    const Theader = () => {
+      if (this.state.queryMode === 0) {
+        return <TheaderOrg />;
+      } else {
+        return <TheaderDisacc />;
+      }
+    }
+    const TheaderOrg = () => {
+      return (
+        <thead>
+          <tr>
+            <th rowSpan="2">
+              <span>物料编码</span>
+            </th>
+            <th rowSpan="2" width="160">
+              <span>物料名称</span>
+            </th>
+            <th colSpan="2">
+              <span>期初情况</span>
+            </th>
+            <th colSpan="3">
+              <span>收入情况</span>
+            </th>
+            <th colSpan="3">
+              <span>发出情况</span>
+            </th>
+            <th colSpan="3">
+              <span>结存情况</span>
+            </th>
+          </tr>
+          <tr>
+            <th>
+              <span>数量</span>
+            </th>
+            <th>
+              <span>金额</span>
+            </th>
+            <th>
+              <span>数量</span>
+            </th>
+            <th>
+              <span>金额</span>
+            </th>
+            <th width="70">
+              <span>来源</span>
+            </th>
+            <th>
+              <span>数量</span>
+            </th>
+            <th>
+              <span>金额</span>
+            </th>
+            <th width="70">
+              <span>帐户别名</span>
+            </th>
+            <th>
+              <span>数量</span>
+            </th>
+            <th>
+              <span>金额</span>
+            </th>
+            <th width="70">
+              <span>子库名称</span>
+            </th>
+          </tr>
+        </thead>
+      );
+    };
+    const TheaderDisacc = () => {
+      return (
+        <thead>
+          <tr>
+            <th>
+              <span>物料编码</span>
+            </th>
+            <th>
+              <span>物料名称</span>
+            </th>
+            <th>
+              <span>数量</span>
+            </th>
+            <th>
+              <span>金额</span>
+            </th>
+          </tr>
+        </thead>
+      );
+    };
+
     const TableBody = () => {
+      if (this.state.queryMode === 0) {
+        return <TableBodyOrg />;
+      } else {
+        return <TableBodyDisacc />;
+      }
+    };
+
+    const TableBodyDisacc = () => {
+      let data = this.props.dataSource.data;
+      if (R.isNil(data)) {
+        return null;
+      }
+      return (
+        <tbody className="ant-table-tbody">
+          {data.map(({ sn, name, quantity, figure }, idx) => (
+            <tr className="ant-table-row" key={idx}>
+              <td>{sn}</td>
+              <td>{name}</td>
+              <td>{quantity}</td>
+              <td>{figure}</td>
+            </tr>
+          ))}
+        </tbody>);
+    };
+
+    const TableBodyOrg = () => {
       let data = this.props.dataSource.data;
       if (R.isNil(data)) {
         return null;
@@ -302,7 +457,7 @@ class InvComponent extends React.Component {
         let newTrData = trData.map(item => item.slice(4, 13));
 
         return (
-          <>
+          <React.Fragment>
             <tr className="ant-table-row">
               {newRow.map((td, keyTd) => (
                 <td
@@ -328,7 +483,7 @@ class InvComponent extends React.Component {
                 ))}
               </tr>
             ))}
-          </>
+          </React.Fragment>
         );
       };
 
@@ -350,8 +505,8 @@ class InvComponent extends React.Component {
               ))}
             </tr>
           ) : (
-            <TrComponent trData={trData} key={key} />
-          )
+              <TrComponent trData={trData} key={key} />
+            )
       );
 
       // 数据列汇总
@@ -411,9 +566,16 @@ class InvComponent extends React.Component {
     };
 
     return (
-      <>
+      <React.Fragment>
         <div className={styles.card}>
-          <div className={styles.title}>查询条件<span>(需选择：库存组织+物料编码 or 账户别名)</span></div>
+          <div className={styles.title}>查询条件
+          <span style={{ 'marginLeft': '2em' }}><RadioGroup
+              className={styles.radioButton}
+              defaultValue={this.state.queryMode}
+              onChange={this.chooseMode}
+            >
+              <RadioButton value={0}>库存组织+物料编码</RadioButton>
+              <RadioButton value={1}>账户别名</RadioButton></RadioGroup></span></div>
           <div className={styles.header}>
             <QueryHeader />
           </div>
@@ -425,63 +587,7 @@ class InvComponent extends React.Component {
             <div className={styles.pdfContainer}>
               <TableTitle />
               <table>
-                <thead>
-                  <tr>
-                    <th rowSpan="2">
-                      <span>物料编码</span>
-                    </th>
-                    <th rowSpan="2" width="160">
-                      <span>物料名称</span>
-                    </th>
-                    <th colSpan="2">
-                      <span>期初情况</span>
-                    </th>
-                    <th colSpan="3">
-                      <span>收入情况</span>
-                    </th>
-                    <th colSpan="3">
-                      <span>发出情况</span>
-                    </th>
-                    <th colSpan="3">
-                      <span>结存情况</span>
-                    </th>
-                  </tr>
-                  <tr>
-                    <th>
-                      <span>数量</span>
-                    </th>
-                    <th>
-                      <span>金额</span>
-                    </th>
-                    <th>
-                      <span>数量</span>
-                    </th>
-                    <th>
-                      <span>金额</span>
-                    </th>
-                    <th width="70">
-                      <span>来源</span>
-                    </th>
-                    <th>
-                      <span>数量</span>
-                    </th>
-                    <th>
-                      <span>金额</span>
-                    </th>
-                    <th width="70">
-                      <span>帐户别名</span>
-                    </th>
-                    <th>
-                      <span>数量</span>
-                    </th>
-                    <th>
-                      <span>金额</span>
-                    </th>
-                    <th width="70">
-                      <span>子库名称</span>
-                    </th>
-                  </tr>
-                </thead>
+                <Theader />
                 <TableBody />
               </table>
               <div className={styles.action}>
@@ -496,7 +602,7 @@ class InvComponent extends React.Component {
               </div>
             </div>
           )}
-      </>
+      </React.Fragment>
     );
   }
 }

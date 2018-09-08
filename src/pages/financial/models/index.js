@@ -54,7 +54,8 @@ export default {
             orgName,
             periodName,
             statType,
-            materialType
+            materialType,
+            queryMode
           } = payload;
 
           let period;
@@ -74,21 +75,30 @@ export default {
           const baseid = yield call(db.getPeriodid, period);
           // 当期收付存id
           const curId = yield call(db.getPeriodid, curPeriodName);
-          // 传入sn及name参数，减少数据行级。
-          // dataSource = yield call(db.getPeriodInv, {
-          dataSource = yield call(db.getIOSInv, {
-            periodid: curId,
-            baseid,
-            orgid: orgName,
-            alias: aliasName.length === 0 ? '%%' : `%${aliasName}%`,
-            sn: materialType && materialSN.length > 0 ? `%${materialSN}%` : '%%',
-            name: !materialType && materialSN.length > 0 ? `%${materialSN}%` : '%%',
-          });
 
-          if (dataSource.data.length) {
-            // console.log(dataSource);
-            // 合并行级
-            dataSource.data = db.handleInvData(dataSource.data);
+          if (queryMode === 1) {
+            dataSource = yield call(db.getPayout, {
+              periodid: curId,
+              baseid,
+              alias: `%${aliasName}%`
+            })
+          } else {
+            // 传入sn及name参数，减少数据行级。
+            // dataSource = yield call(db.getPeriodInv, {
+            dataSource = yield call(db.getIOSInv, {
+              periodid: curId,
+              baseid,
+              orgid: orgName,
+              sn: materialType && materialSN.length > 0 ? `%${materialSN}%` : '%%',
+              name: !materialType && materialSN.length > 0 ? `%${materialSN}%` : '%%',
+            });
+
+
+            if (dataSource.data.length) {
+              // console.log(dataSource);
+              // 合并行级
+              dataSource.data = db.handleInvData(dataSource.data);
+            }
           }
           break;
         case '/excess':
