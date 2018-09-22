@@ -1,9 +1,9 @@
 import React from "react";
 import { connect } from "dva";
-import { DatePicker, Button, Icon, Row, Col } from "antd";
-import { Radio, Select, Input } from "antd";
+import { DatePicker, Button, Icon, Row, Col, Radio, Select, Spin } from "antd";
 import * as lib from "../../../utils/lib";
 import LoadingComponent from "./LoadingComponent";
+import debounce from 'lodash/debounce';
 
 import styles from "./inv.less";
 
@@ -32,8 +32,13 @@ class InvComponent extends React.Component {
       materialType: true,
       orgList: props.orgList,
       loaded: false,
-      queryMode: 0
+      queryMode: 0,
+      srcMsn: [],
+      srcDis: [],
+      fetching: false
     };
+    // this.lastFetchId = 0;
+    this.searchMsn = debounce(this.searchMsn, 800);
   }
 
   componentDidUpdate = ({ orgList }) => {
@@ -81,11 +86,20 @@ class InvComponent extends React.Component {
   //   option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0;
 
   onChangeMaterialSN = e => {
-    const materialType = /^\d+(\.\d+)?$/.test(e.target.value);
-    this.setState({
-      materialSN: e.target.value,
-      materialType
-    });
+    // if (!e.taget) {
+    //   return;
+    // }
+    console.log("e", e);
+    // const materialType = /^\d+(\.\d+)?$/.test(e);
+    // this.setState({
+    //   materialSN: e,
+    //   srcMsn: [],
+    //   fetching: false,
+    // });
+    // this.setState({
+    //   materialSN: e
+    // });
+    console.log("sn", this.state.materialSN);
   };
 
   onChangeAliasName = e => {
@@ -136,6 +150,50 @@ class InvComponent extends React.Component {
   //   this.queryData();
   // }
 
+  searchMsn = async (value) => {
+    // this.lastFetchId += 1;
+    // const fetchId = this.lastFetchId;
+
+    if (this.state.fetching) {
+      return;
+    }
+    if (value && value.length >= 3) {
+      this.setState({ srcMsn: [], fetching: true });
+      let data = await this.props.dispatch({
+        type: "financial/getMsn",
+        payload: { s: value }
+      });
+      // let srcMsn = data.map(item => item.sn + "/" + item.name);
+      this.setState({ srcMsn: R.isNil(data) ? [] : data.map(s => { return { value: s.sn, text: s.sn + "/" + s.name } }), fetching: false });
+    }
+  };
+
+  searchDis = async (value) => {
+    // this.lastFetchId += 1;
+    // const fetchId = this.lastFetchId;
+
+    if (this.state.fetching) {
+      return;
+    }
+    if (value && value.length >= 3) {
+      this.setState({ srcMsn: [], fetching: true });
+      let data = await this.props.dispatch({
+        type: "financial/getDis",
+        payload: { s: value }
+      });
+      // let srcMsn = data.map(item => item.sn + "/" + item.name);
+      this.setState({ srcDis: R.isNil(data) ? [] : data, fetching: false });
+    }
+  };
+
+  onMsnSelect = (value) => {
+    this.setState({ materialSN: value });
+  }
+
+  onDisSelect = (value) => {
+    this.setState({ aliasName: value });
+  }
+
   render() {
     const HeaderOrgCol0 = () => {
       return (
@@ -152,9 +210,9 @@ class InvComponent extends React.Component {
             value={this.state.orgName}
           // filterOption={this.handleOrgFilter}
           >
-            {this.state.orgList.map(({ k, v, code }) => (
-              <Option value={k} key={code}>
-                {v}
+            {this.state.orgList.map(({ value, name, code }) => (
+              <Option value={value} key={code}>
+                {name}
               </Option>
             ))}
           </Select>
@@ -163,18 +221,23 @@ class InvComponent extends React.Component {
     };
 
     const HeaderDisaccCol0 = () => {
+      const { fetching, srcDis, aliasName } = this.state;
+      const children = srcDis.map(d => (<Option key={d}>{d}</Option>));
       return (
         <div className={styles.formItem}>
           <label className={[styles.formLabel, styles.required].join(" ")}>帐户别名:</label>
-          <Input
-            placeholder="输入帐户别名"
-            prefix={
-              <Icon type="team" style={{ color: "rgba(0,0,0,.25)" }} />
-            }
-            defaultValue={this.state.aliasName}
-            onBlur={this.onChangeAliasName}
+          <Select
+            // dataSource={dataSource}
+            showSearch
+            // style={{ width: 350 }}
             className={styles.formContainer}
-          />
+            onSelect={this.onDisSelect}
+            value={aliasName}
+            notFoundContent={fetching ? <Spin size="small" /> : null}
+            filterOption={false}
+            onSearch={this.searchDis}
+            placeholder="输入账户别名"
+          >{children}</Select>
         </div>
       );
     };
@@ -191,20 +254,22 @@ class InvComponent extends React.Component {
       if (parseInt(props.queryMode, 10) === 1) {
         return null;
       } else {
+        const { fetching, srcMsn, materialSN } = this.state;
+        const children = srcMsn.map((sn, idx) => { return <Option key={sn.value}>{sn.text}</Option> });
         return (
           <div className={[styles.formItem, styles.formAction].join(" ")}>
-            <label className={[styles.formLabel, styles.required].join(" ")}>
-              {this.state.materialType ? "物料编码" : "物料名称 "}:
-              </label>
-            <Input
-              placeholder="输入物料编码/名称"
-              prefix={
-                <Icon type="barcode" style={{ color: "rgba(0,0,0,.25)" }} />
-              }
-              defaultValue={this.state.materialSN}
-              onBlur={this.onChangeMaterialSN}
-              className={styles.formContainer}
-            />
+            <label className={[styles.formLabel, styles.required].join(" ")}>物料编码或名称</label>
+            <Select
+              // dataSource={dataSource}
+              showSearch
+              style={{ width: 350 }}
+              onSelect={this.onMsnSelect}
+              value={materialSN}
+              notFoundContent={fetching ? <Spin size="small" /> : null}
+              filterOption={false}
+              onSearch={this.searchMsn}
+              placeholder="输入物料编码或名称"
+            >{children}</Select>
           </div>
         );
       }

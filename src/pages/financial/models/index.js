@@ -34,6 +34,17 @@ export default {
         }
       })
     },
+    * getMsn(payload, {
+      call
+    }) {
+      let data = yield call(db.getMsn, payload);
+      return data;
+    },
+    * getDis(payload, {
+      call
+    }) {
+      return yield call(db.getDis, payload);
+    },
     * refreshData({
       payload
     }, {

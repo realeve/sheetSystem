@@ -18,8 +18,23 @@ const API = {
   IF_REMAIN: DEV ? LOCAL + '713e3e1011_invSub.json' : SERV + '154/713e3e1011.html',
   IF_IOS_COMBINE: DEV ? LOCAL + '4653126720_ios_combine.json' : SERV + '156/4653126720.html',
   ORG_LIST: DEV ? LOCAL + '5f830d1833_org.json' : SERV + '157/5f830d1833.html',
-  IF_DISACC: DEV ? LOCAL + '99842b0552_disaccount.json' : SERV + ''
+  IF_DISACC: DEV ? LOCAL + '99842b0552_disaccount.json' : SERV + '158/99842b0552.html',
+  IF_MSN: DEV ? LOCAL + 'materialsn.json' : SERV + '',
+  IF_DIS: DEV ? LOCAL + 'disaccount.json' : SERV + ''
 };
+
+export const getMsn = async params => await axios({
+  url: API.IF_MSN,
+  params
+}).then(
+  data => {
+    return data;
+  });
+
+export const getDis = async params => await axios({
+  url: API.IF_DIS,
+  params
+}).then(data => data);
 
 export const getOrgList = async () => await axios({
   url: API.ORG_LIST
