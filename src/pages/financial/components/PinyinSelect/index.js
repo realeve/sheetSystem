@@ -1,8 +1,6 @@
 import React from 'react';
 import { Select } from 'antd';
-import styles from './inv.less';
-
-import pinyin from '../../../utils/pinyin.js';
+import pinyin from './pinyin.js';
 const Option = Select.Option;
 
 export default function InputSelect(props) {
@@ -21,7 +19,7 @@ export default function InputSelect(props) {
   return (
     <Select
       showSearch
-      className={styles.formContainer}
+      style={{ width: 203 }}
       placeholder={placeholder}
       optionFilterProp="children"
       onChange={onChange}

@@ -35,9 +35,9 @@ export default class InputSelect extends Component {
   render() {
     const { fetching, src, value } = this.state;
 
-    const options = src.map((sn, idx) => {
-      return <Option key={sn.value}>{sn.text}</Option>;
-    });
+    const options = src.map(({ value, text }) => (
+      <Option key={value}>{text}</Option>
+    ));
 
     let { label, placeholder } = this.props;
 
@@ -50,7 +50,7 @@ export default class InputSelect extends Component {
           showSearch
           value={value}
           placeholder={placeholder}
-          style={{ width: 210 }}
+          style={{ width: 203 }}
           defaultActiveFirstOption={false}
           filterOption={false}
           onSearch={this.onSearch}

@@ -6,7 +6,7 @@ import styles from './inv.less';
 
 import classNames from 'classnames';
 import InputSelect from './InputSelect';
-import PinyinSelect from './PinyinSelect';
+import PinyinSelect from './PinyinSelect/';
 import InvTable from './InvTable';
 
 import moment from 'moment';
