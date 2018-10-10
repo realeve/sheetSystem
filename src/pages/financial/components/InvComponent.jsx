@@ -1,21 +1,24 @@
-import React from "react";
-import { connect } from "dva";
-import { DatePicker, Button, Icon, Row, Col, Radio, Select, Spin } from "antd";
-import * as lib from "../../../utils/lib";
-import LoadingComponent from "./LoadingComponent";
+import React from 'react';
+import { connect } from 'dva';
+import { DatePicker, Button, Icon, Row, Col, Radio, Select, Spin } from 'antd';
+import * as lib from '../../../utils/lib';
+import LoadingComponent from './LoadingComponent';
 import debounce from 'lodash/debounce';
 
-import styles from "./inv.less";
+import styles from './inv.less';
+import pinyin from '../../../utils/pinyin.js';
+import * as db from '../services/db';
 
-import moment from "moment";
-import "moment/locale/zh-cn";
-moment.locale("zh-cn");
+import moment from 'moment';
+import 'moment/locale/zh-cn';
+
+moment.locale('zh-cn');
 
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
 const Option = Select.Option;
 
-const R = require("ramda");
+const R = require('ramda');
 
 class InvComponent extends React.Component {
   // queryMode 0 means query by orgname and sn of materialsn;
@@ -24,10 +27,10 @@ class InvComponent extends React.Component {
     super(props);
     this.state = {
       periodName: props.dateRange[1].substr(0, 7),
-      statType: "1",
-      orgName: "",
-      materialSN: "",
-      aliasName: "",
+      statType: '1',
+      orgName: '',
+      materialSN: '',
+      aliasName: '',
       // 物料编码
       materialType: true,
       orgList: props.orgList,
@@ -57,7 +60,7 @@ class InvComponent extends React.Component {
 
   onDateChange = async (dates, dateStrings) => {
     await this.props.dispatch({
-      type: "financial/setStore",
+      type: 'financial/setStore',
       payload: { dateRange: [dateStrings, dateStrings] }
     });
 
@@ -82,14 +85,23 @@ class InvComponent extends React.Component {
     });
   };
 
-  // handleOrgFilter = (input, option) =>
-  //   option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0;
+  handleOrgFilter = (searchText, { props: { value, children: text } }) => {
+    text = text.trim().toLowerCase();
+    searchText = searchText.trim().toLowerCase();
+    // let pyShort = pinyin.toPinYin(text).toLowerCase();
+    // let pyFull = pinyin.toPinYinFull(text).toLowerCase();
+    return [
+      text,
+      pinyin.toPinYin(text).toLowerCase(),
+      pinyin.toPinYinFull(text).toLowerCase()
+    ].find(a => a.includes(searchText));
+  };
 
   onChangeMaterialSN = e => {
     // if (!e.taget) {
     //   return;
     // }
-    console.log("e", e);
+    console.log('e', e);
     // const materialType = /^\d+(\.\d+)?$/.test(e);
     // this.setState({
     //   materialSN: e,
@@ -99,7 +111,7 @@ class InvComponent extends React.Component {
     // this.setState({
     //   materialSN: e
     // });
-    console.log("sn", this.state.materialSN);
+    console.log('sn', this.state.materialSN);
   };
 
   onChangeAliasName = e => {
@@ -121,7 +133,7 @@ class InvComponent extends React.Component {
       queryMode
     } = this.state;
     this.props.dispatch({
-      type: "financial/refreshData",
+      type: 'financial/refreshData',
       payload: {
         periodName,
         statType,
@@ -136,10 +148,10 @@ class InvComponent extends React.Component {
 
   reset = () => {
     this.setState({
-      statType: "1",
-      orgName: "",
-      materialSN: "",
-      aliasName: "",
+      statType: '1',
+      orgName: '',
+      materialSN: '',
+      aliasName: '',
       materialType: true,
       orgList: this.props.orgList,
       loaded: false
@@ -150,25 +162,41 @@ class InvComponent extends React.Component {
   //   this.queryData();
   // }
 
-  searchMsn = async (value) => {
+  searchMsn = async (value = '') => {
     // this.lastFetchId += 1;
     // const fetchId = this.lastFetchId;
 
-    if (this.state.fetching) {
+    if (this.state.fetching || value.length <= 3) {
       return;
     }
-    if (value && value.length >= 3) {
-      this.setState({ srcMsn: [], fetching: true });
-      let data = await this.props.dispatch({
-        type: "financial/getMsn",
-        payload: { s: value }
-      });
-      // let srcMsn = data.map(item => item.sn + "/" + item.name);
-      this.setState({ srcMsn: R.isNil(data) ? [] : data.map(s => { return { value: s.sn, text: s.sn + "/" + s.name } }), fetching: false });
-    }
+    // if (value && value.length >= 3) {
+    //   this.setState({ srcMsn: [], fetching: true });
+
+    //   let data = await this.props.dispatch({
+    //     type: 'financial/getMsn',
+    //     payload: { s: value }
+    //   });
+    //   // let srcMsn = data.map(item => item.sn + "/" + item.name);
+    //   // this.setState({ srcMsn: R.isNil(data) ? [] : data.map(s => { return { value: s.sn, text: s.sn + "/" + s.name } }), fetching: false });
+    //   data = data || [];
+    //   console.log(data);
+    //   let srcMsn = data.map(({ sn: value, name }) => ({
+    //     value,
+    //     text: `${value}/${name}`
+    //   }));
+    //   this.setState({ srcMsn, fetching: false });
+    // }
+
+    this.setState({ srcMsn: [], fetching: true });
+    let data = await db.getMsn({ s: value });
+    let srcMsn = data.map(({ sn: value, name }) => ({
+      value,
+      text: `${value}/${name}`
+    }));
+    this.setState({ srcMsn, fetching: false });
   };
 
-  searchDis = async (value) => {
+  searchDis = async value => {
     // this.lastFetchId += 1;
     // const fetchId = this.lastFetchId;
 
@@ -178,7 +206,7 @@ class InvComponent extends React.Component {
     if (value && value.length >= 3) {
       this.setState({ srcMsn: [], fetching: true });
       let data = await this.props.dispatch({
-        type: "financial/getDis",
+        type: 'financial/getDis',
         payload: { s: value }
       });
       // let srcMsn = data.map(item => item.sn + "/" + item.name);
@@ -186,46 +214,53 @@ class InvComponent extends React.Component {
     }
   };
 
-  onMsnSelect = (value) => {
+  onMsnSelect = value => {
     this.setState({ materialSN: value });
-  }
+  };
 
-  onDisSelect = (value) => {
+  onDisSelect = value => {
     this.setState({ aliasName: value });
-  }
+  };
 
   render() {
     const HeaderOrgCol0 = () => {
       return (
-        <div className={styles.formItem}>
-          <label className={[styles.formLabel, styles.required].join(" ")}>
-            库存组织:
-              </label>
-          <Select
-            showSearch
-            className={styles.formContainer}
-            placeholder="选择库存组织"
-            optionFilterProp="children"
-            onChange={this.handleOrgChange}
-            value={this.state.orgName}
-          // filterOption={this.handleOrgFilter}
-          >
-            {this.state.orgList.map(({ value, name, code }) => (
-              <Option value={value} key={code}>
-                {name}
-              </Option>
-            ))}
-          </Select>
-        </div>
+        <>
+          <div className={styles.formItem}>
+            <label className={[styles.formLabel, styles.required].join(' ')}>
+              库存组织:
+            </label>
+            <Select
+              showSearch
+              className={styles.formContainer}
+              placeholder="选择库存组织"
+              optionFilterProp="children"
+              onChange={this.handleOrgChange}
+              value={this.state.orgName}
+              filterOption={this.handleOrgFilter}>
+              {this.state.orgList.map(({ value, name, code }) => (
+                <Option value={value} key={code}>
+                  {name}
+                </Option>
+              ))}
+            </Select>
+          </div>
+          <p className={styles.formItem}>
+            此处支持首字母过滤，在选择框中输入 cl 或者 cailiao 或者 材料
+            将匹配出所有含“材料”字样的库存组织
+          </p>
+        </>
       );
     };
 
     const HeaderDisaccCol0 = () => {
       const { fetching, srcDis, aliasName } = this.state;
-      const children = srcDis.map(d => (<Option key={d}>{d}</Option>));
+      const children = srcDis.map(d => <Option key={d}>{d}</Option>);
       return (
         <div className={styles.formItem}>
-          <label className={[styles.formLabel, styles.required].join(" ")}>帐户别名:</label>
+          <label className={[styles.formLabel, styles.required].join(' ')}>
+            帐户别名:
+          </label>
           <Select
             // dataSource={dataSource}
             showSearch
@@ -236,29 +271,34 @@ class InvComponent extends React.Component {
             notFoundContent={fetching ? <Spin size="small" /> : null}
             filterOption={false}
             onSearch={this.searchDis}
-            placeholder="输入账户别名"
-          >{children}</Select>
+            placeholder="输入账户别名">
+            {children}
+          </Select>
         </div>
       );
     };
 
-    const HeaderCol0 = (props) => {
+    const HeaderCol0 = props => {
       if (parseInt(props.queryMode, 10) === 1) {
         return <HeaderDisaccCol0 />;
       } else {
         return <HeaderOrgCol0 />;
       }
-    }
+    };
 
-    const HeaderCol1 = (props) => {
+    const HeaderCol1 = props => {
       if (parseInt(props.queryMode, 10) === 1) {
         return null;
       } else {
         const { fetching, srcMsn, materialSN } = this.state;
-        const children = srcMsn.map((sn, idx) => { return <Option key={sn.value}>{sn.text}</Option> });
+        const children = srcMsn.map((sn, idx) => {
+          return <Option key={sn.value}>{sn.text}</Option>;
+        });
         return (
-          <div className={[styles.formItem, styles.formAction].join(" ")}>
-            <label className={[styles.formLabel, styles.required].join(" ")}>物料编码或名称</label>
+          <div className={[styles.formItem, styles.formAction].join(' ')}>
+            <label className={[styles.formLabel, styles.required].join(' ')}>
+              物料编码或名称
+            </label>
             <Select
               // dataSource={dataSource}
               showSearch
@@ -268,21 +308,24 @@ class InvComponent extends React.Component {
               notFoundContent={fetching ? <Spin size="small" /> : null}
               filterOption={false}
               onSearch={this.searchMsn}
-              placeholder="输入物料编码或名称"
-            >{children}</Select>
+              placeholder="输入物料编码或名称">
+              {children}
+            </Select>
           </div>
         );
       }
-    }
+    };
     const QueryHeader = () => {
       const { dateRange } = this.props;
-      const queryValidate = this.state.queryMode === 0 ? (
-        this.state.orgName.length * this.state.materialSN.length === 0) : (this.state.aliasName.length === 0);
+      const queryValidate =
+        this.state.queryMode === 0
+          ? this.state.orgName.length * this.state.materialSN.length === 0
+          : this.state.aliasName.length === 0;
       return (
         <Row gutter={8}>
           <Col span={12}>
-            <div className={[styles.formItem, styles.formAction].join(" ")}>
-              <label className={[styles.formLabel, styles.required].join(" ")}>
+            <div className={[styles.formItem, styles.formAction].join(' ')}>
+              <label className={[styles.formLabel, styles.required].join(' ')}>
                 查询期间:
               </label>
               <DatePicker.MonthPicker
@@ -298,28 +341,28 @@ class InvComponent extends React.Component {
               <Button
                 type="primary"
                 onClick={this.queryData}
-                disabled={queryValidate}
-              >
-                <Icon type="search" />查询
+                disabled={queryValidate}>
+                <Icon type="search" />
+                查询
               </Button>
               <Button
                 type="primary"
-                onClick={this.reset} style={{ "marginLeft": "2em" }}
-              >
-                <Icon type="search" />重置
+                onClick={this.reset}
+                style={{ marginLeft: '2em' }}>
+                <Icon type="search" />
+                重置
               </Button>
             </div>
           </Col>
           <Col span={12}>
             <div className={styles.formItem}>
-              <label className={[styles.formLabel, styles.required].join(" ")}>
+              <label className={[styles.formLabel, styles.required].join(' ')}>
                 统计类型:
               </label>
               <RadioGroup
                 className={styles.radioButton}
                 defaultValue={this.state.statType}
-                onChange={this.handleStatTypeChange}
-              >
+                onChange={this.handleStatTypeChange}>
                 <RadioButton value="0">期初至今</RadioButton>
                 <RadioButton value="1">本期年初至今</RadioButton>
               </RadioGroup>
@@ -331,17 +374,19 @@ class InvComponent extends React.Component {
     };
 
     const getOrgName = () => {
-      let org = this.state.orgList.find(
-        ({ k }) => k === this.state.orgName
-      );
+      let org = this.state.orgList.find(({ k }) => k === this.state.orgName);
       if (org && org.v) {
         return org.v;
       }
-      return "";
+      return '';
     };
     const TableTitle = () => (
       <div className={styles.head}>
-        <h2>物料{this.state.queryMode === 0 ? "收付存" : "账户发放"}统计查询</h2>
+        <h2>
+          物料
+          {this.state.queryMode === 0 ? '收付存' : '账户发放'}
+          统计查询
+        </h2>
         <ul>
           <li>
             <span>查询期间：</span>
@@ -350,17 +395,19 @@ class InvComponent extends React.Component {
           <li>
             <span>统计类型：</span>
             <div>
-              {this.state.statType === "0" ? "期初至今" : "本期年初至今"}
+              {this.state.statType === '0' ? '期初至今' : '本期年初至今'}
             </div>
           </li>
-          {this.state.queryMode === 0 && (<li>
-            <span>库存组织：</span>
-            <div>{getOrgName()}</div>
-          </li>)}
+          {this.state.queryMode === 0 && (
+            <li>
+              <span>库存组织：</span>
+              <div>{getOrgName()}</div>
+            </li>
+          )}
           {this.state.queryMode === 0 && (
             <li>
               <span>
-                {this.state.materialType ? "物料编码" : "物料名称 "}：
+                {this.state.materialType ? '物料编码' : '物料名称 '}：
               </span>
               <div>{this.state.materialSN}</div>
             </li>
@@ -382,7 +429,7 @@ class InvComponent extends React.Component {
       } else {
         return <TheaderDisacc />;
       }
-    }
+    };
     const TheaderOrg = () => {
       return (
         <thead>
@@ -488,7 +535,8 @@ class InvComponent extends React.Component {
               <td>{figure}</td>
             </tr>
           ))}
-        </tbody>);
+        </tbody>
+      );
     };
 
     const TableBodyOrg = () => {
@@ -514,9 +562,9 @@ class InvComponent extends React.Component {
               // 汇总第key条数据
               sum += Number(item[key]);
             });
-            newRow[key] = sum !== 0 ? "小计: " + lib.thouandsNum(sum) : "";
+            newRow[key] = sum !== 0 ? '小计: ' + lib.thouandsNum(sum) : '';
           } else {
-            newRow[key] = "";
+            newRow[key] = '';
           }
         });
         let newTrData = trData.map(item => item.slice(4, 13));
@@ -528,8 +576,7 @@ class InvComponent extends React.Component {
                 <td
                   key={keyTd}
                   rowSpan={keyTd < 4 ? trData.length + 1 : 1}
-                  style={{ textAlign: keyTd < 2 ? "left" : "right" }}
-                >
+                  style={{ textAlign: keyTd < 2 ? 'left' : 'right' }}>
                   {td}
                 </td>
               ))}
@@ -540,9 +587,8 @@ class InvComponent extends React.Component {
                   <td
                     key={keyTd}
                     style={{
-                      textAlign: (keyTd + 1) % 3 === 0 ? "left" : "right"
-                    }}
-                  >
+                      textAlign: (keyTd + 1) % 3 === 0 ? 'left' : 'right'
+                    }}>
                     {(keyTd + 1) % 3 === 0 ? td : lib.thouandsNum(td)}
                   </td>
                 ))}
@@ -561,17 +607,16 @@ class InvComponent extends React.Component {
                   key={keyTd}
                   style={{
                     textAlign: [2, 3, 4, 5, 7, 8, 10, 11].includes(keyTd)
-                      ? "right"
-                      : "left"
-                  }}
-                >
+                      ? 'right'
+                      : 'left'
+                  }}>
                   {handleTdData(td, keyTd)}
                 </td>
               ))}
             </tr>
           ) : (
-              <TrComponent trData={trData} key={key} />
-            )
+            <TrComponent trData={trData} key={key} />
+          )
       );
 
       // 数据列汇总
@@ -589,7 +634,7 @@ class InvComponent extends React.Component {
           let sum = 0;
           let baseData = R.compose(
             R.uniq,
-            R.map(R.pick(["0", "1", "2", "3"]))
+            R.map(R.pick(['0', '1', '2', '3']))
           )(data);
           baseData.forEach(trData => {
             sum += Number(trData[idx]);
@@ -598,18 +643,18 @@ class InvComponent extends React.Component {
         };
 
         let newRow = [
-          "汇总",
+          '汇总',
           sumBaseData(2),
           sumBaseData(3),
           sumData(4),
           sumData(5),
-          "",
+          '',
           sumData(7),
           sumData(8),
-          "",
+          '',
           sumData(10),
           sumData(11),
-          ""
+          ''
         ];
         return (
           <tr className={`ant-table-row ${styles.countRow}`}>
@@ -633,14 +678,18 @@ class InvComponent extends React.Component {
     return (
       <React.Fragment>
         <div className={styles.card}>
-          <div className={styles.title}>查询条件
-          <span style={{ 'marginLeft': '2em' }}><RadioGroup
-              className={styles.radioButton}
-              defaultValue={this.state.queryMode}
-              onChange={this.chooseMode}
-            >
-              <RadioButton value={0}>库存组织+物料编码</RadioButton>
-              <RadioButton value={1}>账户别名</RadioButton></RadioGroup></span></div>
+          <div className={styles.title}>
+            查询条件
+            <span style={{ marginLeft: '2em' }}>
+              <RadioGroup
+                className={styles.radioButton}
+                defaultValue={this.state.queryMode}
+                onChange={this.chooseMode}>
+                <RadioButton value={0}>库存组织+物料编码</RadioButton>
+                <RadioButton value={1}>账户别名</RadioButton>
+              </RadioGroup>
+            </span>
+          </div>
           <div className={styles.header}>
             <QueryHeader />
           </div>
@@ -660,8 +709,7 @@ class InvComponent extends React.Component {
                   type="primary"
                   onClick={() => {
                     window.print();
-                  }}
-                >
+                  }}>
                   打印报表 <Icon type="printer" />
                 </Button>
               </div>
