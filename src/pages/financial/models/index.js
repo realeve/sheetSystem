@@ -1,8 +1,8 @@
-import * as db from "../services/db";
-import dateRanges from "../../../utils/ranges";
-import moment from "moment";
+import * as db from '../services/db';
+import dateRanges from '../../../utils/ranges';
+import moment from 'moment';
 
-const namespace = "financial";
+const namespace = 'financial';
 export default {
   namespace,
   state: {
@@ -12,9 +12,7 @@ export default {
     router: ''
   },
   reducers: {
-    setStore(state, {
-      payload
-    }) {
+    setStore(state, { payload }) {
       return {
         ...state,
         ...payload
@@ -22,39 +20,17 @@ export default {
     }
   },
   effects: {
-    * getOrgList(payload, {
-      call,
-      put
-    }) {
+    *getOrgList(payload, { call, put }) {
       let orgList = yield call(db.getOrgList);
       yield put({
         type: 'setStore',
         payload: {
           orgList
         }
-      })
+      });
     },
-    * getMsn(payload, {
-      call
-    }) {
-      let data = yield call(db.getMsn, payload);
-      return data;
-    },
-    * getDis(payload, {
-      call
-    }) {
-      return yield call(db.getDis, payload);
-    },
-    * refreshData({
-      payload
-    }, {
-      call,
-      put,
-      select
-    }) {
-      const {
-        router
-      } = yield select(state => state[namespace]);
+    *refreshData({ payload }, { call, put, select }) {
+      const { router } = yield select(state => state[namespace]);
       // 根据路由调整数据
       let dataSource = [];
       switch (router) {
@@ -73,15 +49,17 @@ export default {
 
           // 期初至今
           if (statType === '0') {
-            period = moment(periodName, "YYYY-MM")
-              .subtract(1, "months")
-              .format("MM-YY");
+            period = moment(periodName, 'YYYY-MM')
+              .subtract(1, 'months')
+              .format('MM-YY');
           } else {
             // 本期年初至今
             let [year] = periodName.split('-');
-            period = moment(`12-${parseInt(year, 10) - 1}`, 'MM-YYYY').format("MM-YY");
+            period = moment(`12-${parseInt(year, 10) - 1}`, 'MM-YYYY').format(
+              'MM-YY'
+            );
           }
-          let curPeriodName = moment(periodName, "YYYY-MM").format("MM-YY");
+          let curPeriodName = moment(periodName, 'YYYY-MM').format('MM-YY');
           // 期初情况(基础数据)
           const baseid = yield call(db.getPeriodid, period);
           // 当期收付存id
@@ -92,7 +70,7 @@ export default {
               periodid: curId,
               baseid,
               alias: `%${aliasName}%`
-            })
+            });
           } else {
             // 传入sn及name参数，减少数据行级。
             // dataSource = yield call(db.getPeriodInv, {
@@ -100,10 +78,15 @@ export default {
               periodid: curId,
               baseid,
               orgid: orgName,
-              sn: materialType && materialSN.length > 0 ? `%${materialSN}%` : '%%',
-              name: !materialType && materialSN.length > 0 ? `%${materialSN}%` : '%%',
+              sn:
+                materialType && materialSN.length > 0
+                  ? `%${materialSN}%`
+                  : '%%',
+              name:
+                !materialType && materialSN.length > 0
+                  ? `%${materialSN}%`
+                  : '%%'
             });
-
 
             if (dataSource.data.length) {
               // console.log(dataSource);
@@ -114,7 +97,10 @@ export default {
           break;
         case '/excess':
           // 当前时间
-          payload.periodid = yield call(db.getPeriodid, moment().format("MM-YY"));
+          payload.periodid = yield call(
+            db.getPeriodid,
+            moment().format('MM-YY')
+          );
           dataSource = yield call(db.getExcess, payload);
           break;
         default:
@@ -122,7 +108,7 @@ export default {
       }
 
       yield put({
-        type: "setStore",
+        type: 'setStore',
         payload: {
           dataSource
         }
@@ -130,23 +116,21 @@ export default {
     }
   },
   subscriptions: {
-    setup({
-      dispatch,
-      history
-    }) {
-      return history.listen(({
-        pathname
-      }) => {
+    setup({ dispatch, history }) {
+      return history.listen(({ pathname }) => {
         if (!pathname.includes(namespace)) {
           return;
         }
-        const [tstart, tend] = dateRanges["过去一月"];
-        const [ts, te] = [tstart.format("YYYY-MM-DD"), tend.format("YYYY-MM-DD")];
+        const [tstart, tend] = dateRanges['过去一月'];
+        const [ts, te] = [
+          tstart.format('YYYY-MM-DD'),
+          tend.format('YYYY-MM-DD')
+        ];
 
-        const router = pathname.replace("/" + namespace, '');
+        const router = pathname.replace('/' + namespace, '');
 
         dispatch({
-          type: "setStore",
+          type: 'setStore',
           payload: {
             dateRange: [ts, te],
             router
@@ -155,7 +139,7 @@ export default {
 
         dispatch({
           type: 'getOrgList'
-        })
+        });
       });
     }
   }

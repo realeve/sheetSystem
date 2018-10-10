@@ -1,4 +1,4 @@
-import InvComponent from "./components/InvComponent";
+import InvComponent from './components/InvComponent';
 export default () => {
   return <InvComponent />;
 };

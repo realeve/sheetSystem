@@ -1,13 +1,14 @@
 import React from 'react';
 import { connect } from 'dva';
-import { DatePicker, Button, Icon, Row, Col, Radio, Select, Spin } from 'antd';
+import { DatePicker, Button, Icon, Row, Col, Radio } from 'antd';
 import * as lib from '../../../utils/lib';
 import LoadingComponent from './LoadingComponent';
-import debounce from 'lodash/debounce';
 
 import styles from './inv.less';
-import pinyin from '../../../utils/pinyin.js';
-import * as db from '../services/db';
+
+import classNames from 'classnames';
+import InputSelect from './InputSelect';
+import PinyinSelect from './PinyinSelect';
 
 import moment from 'moment';
 import 'moment/locale/zh-cn';
@@ -16,7 +17,6 @@ moment.locale('zh-cn');
 
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
-const Option = Select.Option;
 
 const R = require('ramda');
 
@@ -36,12 +36,9 @@ class InvComponent extends React.Component {
       orgList: props.orgList,
       loaded: false,
       queryMode: 0,
-      srcMsn: [],
-      srcDis: [],
       fetching: false
     };
     // this.lastFetchId = 0;
-    this.searchMsn = debounce(this.searchMsn, 800);
   }
 
   componentDidUpdate = ({ orgList }) => {
@@ -54,6 +51,7 @@ class InvComponent extends React.Component {
   };
 
   chooseMode = e => {
+    // 20181010, libin:不允许修改props中的内容，此处的目的是？
     this.props.dataSource.data = [];
     this.setState({ queryMode: e.target.value });
   };
@@ -67,51 +65,12 @@ class InvComponent extends React.Component {
     this.setState({
       periodName: dateStrings.substr(0, 7)
     });
-
-    // this.props.dispatch({
-    //   type: "financial/refreshData"
-    // });
   };
 
   handleStatTypeChange = e => {
     this.setState({
       statType: e.target.value
     });
-  };
-
-  handleOrgChange = orgName => {
-    this.setState({
-      orgName
-    });
-  };
-
-  handleOrgFilter = (searchText, { props: { value, children: text } }) => {
-    text = text.trim().toLowerCase();
-    searchText = searchText.trim().toLowerCase();
-    // let pyShort = pinyin.toPinYin(text).toLowerCase();
-    // let pyFull = pinyin.toPinYinFull(text).toLowerCase();
-    return [
-      text,
-      pinyin.toPinYin(text).toLowerCase(),
-      pinyin.toPinYinFull(text).toLowerCase()
-    ].find(a => a.includes(searchText));
-  };
-
-  onChangeMaterialSN = e => {
-    // if (!e.taget) {
-    //   return;
-    // }
-    console.log('e', e);
-    // const materialType = /^\d+(\.\d+)?$/.test(e);
-    // this.setState({
-    //   materialSN: e,
-    //   srcMsn: [],
-    //   fetching: false,
-    // });
-    // this.setState({
-    //   materialSN: e
-    // });
-    console.log('sn', this.state.materialSN);
   };
 
   onChangeAliasName = e => {
@@ -123,26 +82,32 @@ class InvComponent extends React.Component {
   queryData = () => {
     this.setState({ loaded: true });
     // 必选的输入框无法清除，始终会有数据，故无需做数据校验
-    const {
-      periodName,
-      statType,
-      orgName,
-      materialSN,
-      aliasName,
-      materialType,
-      queryMode
-    } = this.state;
+
+    // 20181010,libin: 试着用底下一段代码替换这里的，测试一下能否通过。
+    // const {
+    //   periodName,
+    //   statType,
+    //   orgName,
+    //   materialSN,
+    //   aliasName,
+    //   materialType,
+    //   queryMode
+    // } = this.state;
+    // this.props.dispatch({
+    //   type: 'financial/refreshData',
+    //   payload: {
+    //     periodName,
+    //     statType,
+    //     orgName,
+    //     materialSN,
+    //     aliasName,
+    //     materialType,
+    //     queryMode
+    //   }
+    // });
     this.props.dispatch({
       type: 'financial/refreshData',
-      payload: {
-        periodName,
-        statType,
-        orgName,
-        materialSN,
-        aliasName,
-        materialType,
-        queryMode
-      }
+      payload: this.state
     });
   };
 
@@ -158,92 +123,29 @@ class InvComponent extends React.Component {
     });
   };
 
-  // componentDidMount() {
-  //   this.queryData();
-  // }
-
-  searchMsn = async (value = '') => {
-    // this.lastFetchId += 1;
-    // const fetchId = this.lastFetchId;
-
-    if (this.state.fetching || value.length <= 3) {
-      return;
-    }
-    // if (value && value.length >= 3) {
-    //   this.setState({ srcMsn: [], fetching: true });
-
-    //   let data = await this.props.dispatch({
-    //     type: 'financial/getMsn',
-    //     payload: { s: value }
-    //   });
-    //   // let srcMsn = data.map(item => item.sn + "/" + item.name);
-    //   // this.setState({ srcMsn: R.isNil(data) ? [] : data.map(s => { return { value: s.sn, text: s.sn + "/" + s.name } }), fetching: false });
-    //   data = data || [];
-    //   console.log(data);
-    //   let srcMsn = data.map(({ sn: value, name }) => ({
-    //     value,
-    //     text: `${value}/${name}`
-    //   }));
-    //   this.setState({ srcMsn, fetching: false });
-    // }
-
-    this.setState({ srcMsn: [], fetching: true });
-    let data = await db.getMsn({ s: value });
-    let srcMsn = data.map(({ sn: value, name }) => ({
+  handleDisData = data => data.map(value => ({ value, text: value }));
+  handleSNData = data =>
+    data.map(({ sn: value, name }) => ({
       value,
       text: `${value}/${name}`
     }));
-    this.setState({ srcMsn, fetching: false });
-  };
-
-  searchDis = async value => {
-    // this.lastFetchId += 1;
-    // const fetchId = this.lastFetchId;
-
-    if (this.state.fetching) {
-      return;
-    }
-    if (value && value.length >= 3) {
-      this.setState({ srcMsn: [], fetching: true });
-      let data = await this.props.dispatch({
-        type: 'financial/getDis',
-        payload: { s: value }
-      });
-      // let srcMsn = data.map(item => item.sn + "/" + item.name);
-      this.setState({ srcDis: R.isNil(data) ? [] : data, fetching: false });
-    }
-  };
-
-  onMsnSelect = value => {
-    this.setState({ materialSN: value });
-  };
-
-  onDisSelect = value => {
-    this.setState({ aliasName: value });
-  };
 
   render() {
     const HeaderOrgCol0 = () => {
       return (
         <>
           <div className={styles.formItem}>
-            <label className={[styles.formLabel, styles.required].join(' ')}>
+            <label className={classNames(styles.formLabel, styles.required)}>
               库存组织:
             </label>
-            <Select
-              showSearch
-              className={styles.formContainer}
-              placeholder="选择库存组织"
-              optionFilterProp="children"
-              onChange={this.handleOrgChange}
+            <PinyinSelect
               value={this.state.orgName}
-              filterOption={this.handleOrgFilter}>
-              {this.state.orgList.map(({ value, name, code }) => (
-                <Option value={value} key={code}>
-                  {name}
-                </Option>
-              ))}
-            </Select>
+              onChange={orgName => {
+                this.setState({ orgName });
+              }}
+              options={this.state.orgList}
+              placeholder={'请选择库存组织'}
+            />
           </div>
           <p className={styles.formItem}>
             此处支持首字母过滤，在选择框中输入 cl 或者 cailiao 或者 材料
@@ -253,79 +155,19 @@ class InvComponent extends React.Component {
       );
     };
 
-    const HeaderDisaccCol0 = () => {
-      const { fetching, srcDis, aliasName } = this.state;
-      const children = srcDis.map(d => <Option key={d}>{d}</Option>);
-      return (
-        <div className={styles.formItem}>
-          <label className={[styles.formLabel, styles.required].join(' ')}>
-            帐户别名:
-          </label>
-          <Select
-            // dataSource={dataSource}
-            showSearch
-            // style={{ width: 350 }}
-            className={styles.formContainer}
-            onSelect={this.onDisSelect}
-            value={aliasName}
-            notFoundContent={fetching ? <Spin size="small" /> : null}
-            filterOption={false}
-            onSearch={this.searchDis}
-            placeholder="输入账户别名">
-            {children}
-          </Select>
-        </div>
-      );
-    };
-
-    const HeaderCol0 = props => {
-      if (parseInt(props.queryMode, 10) === 1) {
-        return <HeaderDisaccCol0 />;
-      } else {
-        return <HeaderOrgCol0 />;
-      }
-    };
-
-    const HeaderCol1 = props => {
-      if (parseInt(props.queryMode, 10) === 1) {
-        return null;
-      } else {
-        const { fetching, srcMsn, materialSN } = this.state;
-        const children = srcMsn.map((sn, idx) => {
-          return <Option key={sn.value}>{sn.text}</Option>;
-        });
-        return (
-          <div className={[styles.formItem, styles.formAction].join(' ')}>
-            <label className={[styles.formLabel, styles.required].join(' ')}>
-              物料编码或名称
-            </label>
-            <Select
-              // dataSource={dataSource}
-              showSearch
-              style={{ width: 350 }}
-              onSelect={this.onMsnSelect}
-              value={materialSN}
-              notFoundContent={fetching ? <Spin size="small" /> : null}
-              filterOption={false}
-              onSearch={this.searchMsn}
-              placeholder="输入物料编码或名称">
-              {children}
-            </Select>
-          </div>
-        );
-      }
-    };
     const QueryHeader = () => {
       const { dateRange } = this.props;
-      const queryValidate =
-        this.state.queryMode === 0
-          ? this.state.orgName.length * this.state.materialSN.length === 0
-          : this.state.aliasName.length === 0;
+      const { materialSN, queryMode, aliasName, orgName } = this.state;
+      const disabledQuery =
+        queryMode === 0
+          ? orgName.length * materialSN.length === 0
+          : aliasName.length === 0;
+
       return (
         <Row gutter={8}>
           <Col span={12}>
-            <div className={[styles.formItem, styles.formAction].join(' ')}>
-              <label className={[styles.formLabel, styles.required].join(' ')}>
+            <div className={classNames(styles.formItem, styles.formAction)}>
+              <label className={classNames(styles.formLabel, styles.required)}>
                 查询期间:
               </label>
               <DatePicker.MonthPicker
@@ -336,12 +178,26 @@ class InvComponent extends React.Component {
                 style={{ width: 203 }}
               />
             </div>
-            <HeaderCol0 queryMode={this.state.queryMode} />
+            {queryMode === 1 ? (
+              <InputSelect
+                placeholder="输入账户别名"
+                label="帐户别名"
+                value={aliasName}
+                onChange={aliasName => {
+                  this.setState({ aliasName });
+                }}
+                fetchingMethod="getDis"
+                callback={this.handleDisData}
+              />
+            ) : (
+              <HeaderOrgCol0 />
+            )}
+
             <div className={styles.formItem}>
               <Button
                 type="primary"
                 onClick={this.queryData}
-                disabled={queryValidate}>
+                disabled={disabledQuery}>
                 <Icon type="search" />
                 查询
               </Button>
@@ -356,7 +212,7 @@ class InvComponent extends React.Component {
           </Col>
           <Col span={12}>
             <div className={styles.formItem}>
-              <label className={[styles.formLabel, styles.required].join(' ')}>
+              <label className={classNames(styles.formLabel, styles.required)}>
                 统计类型:
               </label>
               <RadioGroup
@@ -367,7 +223,18 @@ class InvComponent extends React.Component {
                 <RadioButton value="1">本期年初至今</RadioButton>
               </RadioGroup>
             </div>
-            <HeaderCol1 queryMode={this.state.queryMode} />
+            {queryMode === 0 && (
+              <InputSelect
+                placeholder="输入物料编码或名称"
+                label="物料编码或名称"
+                value={materialSN}
+                onChange={materialSN => {
+                  this.setState({ materialSN });
+                }}
+                fetchingMethod="getMsn"
+                callback={this.handleSNData}
+              />
+            )}
           </Col>
         </Row>
       );
