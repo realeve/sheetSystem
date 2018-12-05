@@ -13,6 +13,7 @@ export default class InputSelect extends Component {
     this.state = {
       fetching: false,
       value: props.value || '',
+      orgid: props.orgid || '',
       src: []
     };
     this.onSearch = debounce(this.onSearch, 500);
@@ -23,13 +24,15 @@ export default class InputSelect extends Component {
   };
 
   onSearch = async (value = '') => {
-    if (this.state.fetching || value.length <= 3) {
+    if (this.state.fetching || value.length < 2) {
       return;
     }
     this.setState({ src: [], fetching: true });
     let { fetchingMethod, callback } = this.props;
-    let data = await db[fetchingMethod]({ s: value });
-    this.setState({ src: callback(data), fetching: false });
+    let params = fetchingMethod == 'getMsn'?{orgid:this.state.orgid,q1:value,q2:value}:{q:value};
+    let data = await db[fetchingMethod](params);
+    // console.log("data2",data);
+    this.setState({ src: callback(data.data), fetching: false });
   };
 
   render() {

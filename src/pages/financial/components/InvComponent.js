@@ -101,12 +101,14 @@ class InvComponent extends React.Component {
     });
   };
 
-  handleDisData = data => data.map(value => ({ value, text: value }));
-  handleSNData = data =>
-    data.map(({ sn: value, name }) => ({
+  handleDisData = data => data.map(({name}) => ({ value:name, text: name }));
+  handleSNData = data =>{
+    // console.log("data",data);
+    return data.map(({ sn: value, name }) => ({
       value,
       text: `${value}/${name}`
     }));
+  }
 
   render() {
     const HeaderOrgCol0 = () => {
@@ -208,6 +210,7 @@ class InvComponent extends React.Component {
                   this.setState({ materialSN });
                 }}
                 fetchingMethod="getMsn"
+                orgid={this.state.orgName}
                 callback={this.handleSNData}
               />
             )}

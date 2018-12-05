@@ -67,9 +67,9 @@ export default {
 
           if (queryMode === 1) {
             dataSource = yield call(db.getPayout, {
-              periodid: curId,
-              baseid,
-              alias: `%${aliasName}%`
+              periodb: curId,
+              perioda:baseid,
+              disaccount: `%${aliasName}%`
             });
           } else {
             // 传入sn及name参数，减少数据行级。
