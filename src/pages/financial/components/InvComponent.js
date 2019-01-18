@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'dva';
-import { DatePicker, Button, Icon, Row, Col, Radio } from 'antd';
+import { DatePicker, Button, Icon, Row, Col, Radio, Tabs, Card } from 'antd';
 
 import styles from './inv.less';
 
@@ -11,11 +11,12 @@ import InvTable from './InvTable';
 
 import moment from 'moment';
 import 'moment/locale/zh-cn';
-
+import VTable from '../../table/components/Table';
 moment.locale('zh-cn');
 
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
+const TabPane = Tabs.TabPane;
 
 const R = require('ramda');
 
@@ -250,9 +251,24 @@ class InvComponent extends React.Component {
             <QueryHeader />
           </div>
         </div>
-        {this.state.loaded && (
-          <InvTable loading={loading} dataSource={dataSource} {...this.state} />
-        )}
+        <Card className={styles.detail}>
+          <Tabs defaultActiveKey="1">
+            <TabPane tab="数据详情" key="1" style={{ minHeight: 500 }}>
+              {this.state.loaded && (
+                <InvTable
+                  loading={loading}
+                  dataSource={dataSource}
+                  {...this.state}
+                />
+              )}
+            </TabPane>
+            <TabPane tab="数据导出" key="2" style={{ minHeight: 500 }}>
+              {this.state.loaded && (
+                <VTable dataSrc={dataSource} {...this.state} />
+              )}
+            </TabPane>
+          </Tabs>
+        </Card>
       </React.Fragment>
     );
   }

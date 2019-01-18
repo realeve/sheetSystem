@@ -1,21 +1,21 @@
 font-face {
-  font-family: "MingLiU";
-  src: url("/font/MingLiU.ttf");
+  font-family: 'MingLiU';
+  src: url('/font/MingLiU.ttf');
 }
 
 font-face {
-  font-family: "PMingLiU";
-  src: url("/font/PMingLiU.ttf");
+  font-family: 'PMingLiU';
+  src: url('/font/PMingLiU.ttf');
 }
 
-@fontname: "MingLiU",
-"PMingLiU",
-"Microsoft JhengHei",
-"DengXian",
-"等线",
-"微软雅黑",
-"YaHei",
-"Microsoft YaHei";
+@fontname: 'MingLiU',
+'PMingLiU',
+'Microsoft JhengHei',
+'DengXian',
+'等线',
+'微软雅黑',
+'YaHei',
+'Microsoft YaHei';
 .card {
   background: #fff;
   border-radius: 3px;
@@ -36,7 +36,7 @@ font-face {
       }
       .required {
         &::before {
-          content: "*";
+          content: '*';
           position: absolute;
           color: #e23;
           left: -10px;
@@ -72,7 +72,7 @@ font-face {
   font-family: @fontname;
   td,
   th {
-    border: solid 1px @table-border-color !important;
+    border: solid 1px @table-border-color  !important;
     padding: 5px !important;
     letter-spacing: -0.05em;
     font-weight: 400;
@@ -99,7 +99,7 @@ font-face {
     }
   }
   .countRow {
-    border-top: solid 2px @table-border-color !important;
+    border-top: solid 2px @table-border-color  !important;
     td:first-child {
       letter-spacing: 1em;
     }
@@ -118,10 +118,14 @@ font-face {
   tbody {
     tr:first-child {
       td {
-        border-top: 2px solid @table-border-color !important;
+        border-top: 2px solid @table-border-color  !important;
       }
     }
   }
+}
+
+.detail {
+  margin-top: 20px;
 }
 
 .pdfContainer {
@@ -165,6 +169,11 @@ font-face {
 }
 
 @media print {
+  .detail {
+    :global(.ant-tabs-bar) {
+      display: none;
+    }
+  }
   .card {
     display: none;
   }

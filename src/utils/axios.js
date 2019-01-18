@@ -2,7 +2,7 @@ import http from 'axios';
 import qs from 'qs';
 
 // export let DEV = false;
-export const DEV = false;
+export const DEV = true;
 
 export let host = DEV
   ? 'http://localhost:90/api/'

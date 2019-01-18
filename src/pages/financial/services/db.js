@@ -82,7 +82,9 @@ export const getIOSInv = (params) =>
     url: API.IF_IOS_COMBINE,
     params
   }).then((res) => {
-    // res.data = res.data.slice(0, 500);
+    if (DEV) {
+      res.data = res.data.slice(0, 200);
+    }
     return res;
   });
 
@@ -91,7 +93,9 @@ export const getPayout = (params) =>
     url: API.IF_DISACC,
     params
   }).then((res) => {
-    // res.data = res.data.slice(0, 500);
+    if (DEV) {
+      res.data = res.data.slice(0, 200);
+    }
     return res;
   });
 
