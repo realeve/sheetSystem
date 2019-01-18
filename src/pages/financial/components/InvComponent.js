@@ -62,7 +62,6 @@ class InvComponent extends React.Component {
         }
       }
     });
-    console.log(e.target.value);
     this.setState({ queryMode: e.target.value });
   };
 
@@ -153,7 +152,7 @@ class InvComponent extends React.Component {
         queryMode === 0
           ? orgName.length === 0 //* materialSN.length === 0
           : aliasName.length === 0;
-      console.log(disabledQuery);
+
       return (
         <Row gutter={8}>
           <Col span={12}>
@@ -166,7 +165,7 @@ class InvComponent extends React.Component {
                 format="YYYY-MM"
                 onChange={this.onDateChange}
                 defaultValue={moment(dateRange[1])}
-                style={{ width: 203 }}
+                style={{ width: 300 }}
               />
             </div>
             {queryMode === 1 ? (

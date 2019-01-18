@@ -29,10 +29,12 @@ export default class InputSelect extends Component {
     }
     this.setState({ src: [], fetching: true });
     let { fetchingMethod, callback } = this.props;
-    let params = fetchingMethod == 'getMsn'?{orgid:this.state.orgid,q1:value,q2:value}:{q:value};
-    let data = await db[fetchingMethod](params);
-    // console.log("data2",data);
-    this.setState({ src: callback(data.data), fetching: false });
+    let params =
+      fetchingMethod === 'getMsn'
+        ? { orgid: this.state.orgid, q1: value, q2: value }
+        : { q: value };
+    let { data } = await db[fetchingMethod](params);
+    this.setState({ src: callback(data), fetching: false });
   };
 
   render() {
@@ -57,7 +59,7 @@ export default class InputSelect extends Component {
           showSearch
           value={value}
           placeholder={placeholder}
-          style={{ width: 203 }}
+          style={{ width: 300 }}
           defaultActiveFirstOption={false}
           filterOption={false}
           onSearch={this.onSearch}

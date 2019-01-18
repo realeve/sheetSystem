@@ -11,7 +11,7 @@ export default function InputSelect(props) {
       text,
       pinyin.toPinYin(text).toLowerCase(),
       pinyin.toPinYinFull(text).toLowerCase()
-    ].find(a => a.includes(searchText));
+    ].find((a) => a.includes(searchText));
   };
 
   let { placeholder, options, value, onChange } = props;
@@ -19,7 +19,7 @@ export default function InputSelect(props) {
   return (
     <Select
       showSearch
-      style={{ width: 203 }}
+      style={{ width: 300 }}
       placeholder={placeholder}
       optionFilterProp="children"
       onChange={onChange}
