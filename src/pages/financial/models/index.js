@@ -30,7 +30,7 @@ export default {
       });
     },
     *refreshData({ payload }, { call, put, select }) {
-      const { router } = yield select(state => state[namespace]);
+      const { router } = yield select((state) => state[namespace]);
       // 根据路由调整数据
       let dataSource = [];
       switch (router) {

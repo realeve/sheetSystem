@@ -49,9 +49,20 @@ class InvComponent extends React.Component {
     });
   };
 
-  chooseMode = e => {
+  chooseMode = (e) => {
     // 20181010, libin:不允许修改props中的内容，此处的目的是？
-    this.props.dataSource.data = [];
+    // this.props.dataSource.data = [];
+
+    // 20190118 不允许直接操作props,tab切换清空数据请用以下方式：
+    this.props.dispatch({
+      type: 'financial/setStore',
+      payload: {
+        dataSource: {
+          data: []
+        }
+      }
+    });
+    console.log(e.target.value);
     this.setState({ queryMode: e.target.value });
   };
 
@@ -66,13 +77,13 @@ class InvComponent extends React.Component {
     });
   };
 
-  handleStatTypeChange = e => {
+  handleStatTypeChange = (e) => {
     this.setState({
       statType: e.target.value
     });
   };
 
-  onChangeAliasName = e => {
+  onChangeAliasName = (e) => {
     this.setState({
       aliasName: e.target.value
     });
@@ -101,8 +112,8 @@ class InvComponent extends React.Component {
     });
   };
 
-  handleDisData = data => data.map(value => ({ value, text: value }));
-  handleSNData = data =>
+  handleDisData = (data) => data.map((value) => ({ value, text: value }));
+  handleSNData = (data) =>
     data.map(({ sn: value, name }) => ({
       value,
       text: `${value}/${name}`
@@ -118,7 +129,7 @@ class InvComponent extends React.Component {
             </label>
             <PinyinSelect
               value={this.state.orgName}
-              onChange={orgName => {
+              onChange={(orgName) => {
                 this.setState({ orgName });
               }}
               options={this.state.orgList}
@@ -139,9 +150,9 @@ class InvComponent extends React.Component {
 
       const disabledQuery =
         queryMode === 0
-          ? orgName.length * materialSN.length === 0
+          ? orgName.length === 0 //* materialSN.length === 0
           : aliasName.length === 0;
-
+      console.log(disabledQuery);
       return (
         <Row gutter={8}>
           <Col span={12}>
@@ -162,7 +173,7 @@ class InvComponent extends React.Component {
                 placeholder="输入账户别名"
                 label="帐户别名"
                 value={aliasName}
-                onChange={aliasName => {
+                onChange={(aliasName) => {
                   this.setState({ aliasName });
                 }}
                 fetchingMethod="getDis"
@@ -204,7 +215,8 @@ class InvComponent extends React.Component {
                 placeholder="输入物料编码或名称"
                 label="物料编码或名称"
                 value={materialSN}
-                onChange={materialSN => {
+                required={false}
+                onChange={(materialSN) => {
                   this.setState({ materialSN });
                 }}
                 fetchingMethod="getMsn"
@@ -228,7 +240,7 @@ class InvComponent extends React.Component {
                 className={styles.radioButton}
                 defaultValue={this.state.queryMode}
                 onChange={this.chooseMode}>
-                <RadioButton value={0}>库存组织+物料编码</RadioButton>
+                <RadioButton value={0}>库存组织</RadioButton>
                 <RadioButton value={1}>账户别名</RadioButton>
               </RadioGroup>
             </span>

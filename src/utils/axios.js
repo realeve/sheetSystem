@@ -1,39 +1,39 @@
-import http from "axios";
-import qs from "qs";
+import http from 'axios';
+import qs from 'qs';
 
 // export let DEV = false;
-export const DEV = true;
+export const DEV = false;
 
-export let host = DEV ?
-  "http://localhost:90/api/" :
-  "http://10.8.1.25:100/api/";
-export let uploadHost = DEV ? "//localhost/upload/" : "//10.8.2.133/upload/";
+export let host = DEV
+  ? 'http://localhost:90/api/'
+  : 'http://10.8.1.25:100/api/';
+export let uploadHost = DEV ? '//localhost/upload/' : '//10.8.2.133/upload/';
 
 // 判断数据类型，对于FormData使用 typeof 方法会得到 object;
-let getType = data =>
+let getType = (data) =>
   Object.prototype.toString
-  .call(data)
-  .match(/\S+/g)[1]
-  .replace("]", "")
-  .toLowerCase();
+    .call(data)
+    .match(/\S+/g)[1]
+    .replace(']', '')
+    .toLowerCase();
 
-const loadUserInfo = function () {
+const loadUserInfo = function() {
   // 业务经办人
   let userInfo = {
-    name: "",
-    uid: "",
-    fullname: "",
-    org: ""
+    name: '',
+    uid: '',
+    fullname: '',
+    org: ''
   };
-  let user = window.localStorage.getItem("user");
+  let user = window.localStorage.getItem('user');
   if (user == null) {
     return {
-      token: ""
+      token: ''
     };
   }
   user = JSON.parse(user);
   window.g_axios.token = user.token;
-  let extraInfo = atob(user.token.split(".")[1]);
+  let extraInfo = atob(user.token.split('.')[1]);
   userInfo.uid = JSON.parse(extraInfo).extra.uid;
 
   return user;
@@ -42,13 +42,13 @@ const loadUserInfo = function () {
 let refreshNoncer = async () => {
   // 此时可将引用url链接作为 url 参数请求登录，作为强校验；
   // 本部分涉及用户名和密码，用户需自行在服务端用curl申请得到token，勿放置在前端;
-  let url = window.g_axios.host + "authorize.json?user=develop&psw=111111";
-  return await http.get(url).then(res => res.data.token);
+  let url = window.g_axios.host + 'authorize.json?user=develop&psw=111111';
+  return await http.get(url).then((res) => res.data.token);
 };
 
 const saveToken = () => {
   window.localStorage.setItem(
-    "user",
+    'user',
     JSON.stringify({
       token: window.g_axios.token
     })
@@ -56,18 +56,18 @@ const saveToken = () => {
 };
 
 // 自动处理token更新，data 序列化等
-export let axios = async option => {
+export let axios = async (option) => {
   if (!window.g_axios) {
     window.g_axios = {
       host,
-      token: ""
+      token: ''
     };
   }
   // token为空时自动获取
-  if (window.g_axios.token === "") {
+  if (window.g_axios.token === '') {
     let user = loadUserInfo();
 
-    if (typeof user === "undefined" || user.token === "") {
+    if (typeof user === 'undefined' || user.token === '') {
       window.g_axios.token = await refreshNoncer();
       saveToken();
     }
@@ -77,7 +77,7 @@ export let axios = async option => {
     headers: {
       Authorization: window.g_axios.token
     },
-    method: option.method ? option.method : "get"
+    method: option.method ? option.method : 'get'
   });
 
   return await http
@@ -85,11 +85,11 @@ export let axios = async option => {
       baseURL: window.g_axios.host,
       timeout: 10000,
       transformRequest: [
-        function (data) {
+        function(data) {
           let dataType = getType(data);
           switch (dataType) {
-            case "object":
-            case "array":
+            case 'object':
+            case 'array':
               data = qs.stringify(data);
               break;
             default:
@@ -99,17 +99,15 @@ export let axios = async option => {
         }
       ]
     })(option)
-    .then(({
-      data
-    }) => {
+    .then(({ data }) => {
       // 刷新token
-      if (typeof data.token !== "undefined") {
+      if (typeof data.token !== 'undefined') {
         window.g_axios.token = data.token;
         saveToken();
       }
       return data;
     })
-    .catch(e => {
+    .catch((e) => {
       console.log(e);
       // let req = response.request;
       // let errMsg = `${req.status} ${

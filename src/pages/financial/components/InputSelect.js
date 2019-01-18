@@ -18,7 +18,7 @@ export default class InputSelect extends Component {
     this.onSearch = debounce(this.onSearch, 500);
   }
 
-  onChange = value => {
+  onChange = (value) => {
     this.props.onChange(value);
   };
 
@@ -39,11 +39,15 @@ export default class InputSelect extends Component {
       <Option key={value}>{text}</Option>
     ));
 
-    let { label, placeholder } = this.props;
+    let { label, placeholder, required } = this.props;
 
     return (
       <div className={classNames(styles.formItem, styles.formAction)}>
-        <label className={classNames(styles.formLabel, styles.required)}>
+        <label
+          className={classNames(
+            styles.formLabel,
+            required ? styles.required : ''
+          )}>
           {label}
         </label>
         <Select
