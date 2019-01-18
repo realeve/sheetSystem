@@ -26,8 +26,8 @@ const API = {
   IF_DISACC: DEV
     ? LOCAL + '99842b0552_disaccount.json'
     : SERV + '158/99842b0552.html',
-  IF_MSN: DEV ? LOCAL + 'materialsn.json' : SERV + '',
-  IF_DIS: DEV ? LOCAL + 'disaccount.json' : SERV + ''
+  IF_MSN: DEV ? LOCAL + 'materialsn.json' : SERV + '187/61bc019d63.html',
+  IF_DIS: DEV ? LOCAL + 'disaccount.json' : SERV + '188/51d67811cb.html'
 };
 
 export const getMsn = (params) =>
@@ -36,12 +36,11 @@ export const getMsn = (params) =>
     params
   });
 
-export const getDis = (params) => {
-  return axios({
+export const getDis = (params) =>
+  axios({
     url: API.IF_DIS,
-    params
+    params: { q1: params.q, q2: params.q }
   });
-};
 
 export const getOrgList = () =>
   axios({

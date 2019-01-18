@@ -112,7 +112,8 @@ class InvComponent extends React.Component {
     });
   };
 
-  handleDisData = (data) => data.map((value) => ({ value, text: value }));
+  handleDisData = (data) =>
+    data.map(({ name }) => ({ value: name, text: name }));
   handleSNData = (data) =>
     data.map(({ sn: value, name }) => ({
       value,
@@ -220,6 +221,7 @@ class InvComponent extends React.Component {
                   this.setState({ materialSN });
                 }}
                 fetchingMethod="getMsn"
+                orgid={this.state.orgName}
                 callback={this.handleSNData}
               />
             )}
