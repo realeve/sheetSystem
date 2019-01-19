@@ -84,6 +84,7 @@ export const getIOSInv = (params) =>
   }).then((res) => {
     if (DEV) {
       res.data = res.data.slice(0, 200);
+      res.rows = res.data.length;
     }
     return res;
   });
@@ -95,6 +96,7 @@ export const getPayout = (params) =>
   }).then((res) => {
     if (DEV) {
       res.data = res.data.slice(0, 200);
+      res.rows = res.data.length;
     }
     return res;
   });

@@ -1,26 +1,28 @@
-import React from "react";
-import { connect } from "dva";
-import { Button, Icon, Slider } from "antd";
-import * as lib from "../../../utils/lib";
-import LoadingComponent from "./LoadingComponent";
-import styles from "./inv.less";
-import moment from "moment";
-import "moment/locale/zh-cn";
-moment.locale("zh-cn");
+import React from 'react';
+import { connect } from 'dva';
+import { Button, Icon, Slider, Tabs, Card } from 'antd';
+import * as lib from '../../../utils/lib';
+import LoadingComponent from './LoadingComponent';
+import styles from './inv.less';
+import VTable from '../../table/components/Table';
+import moment from 'moment';
+import 'moment/locale/zh-cn';
+moment.locale('zh-cn');
 
-const R = require("ramda");
+const R = require('ramda');
+const TabPane = Tabs.TabPane;
 
 class InvComponent extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       timeLength: 3,
-      timeDesc: ["1-2年", "2-3年", "3-4年", "4-5年", "5年以上"],
+      timeDesc: ['1-2年', '2-3年', '3-4年', '4-5年', '5年以上'],
       loaded: false
     };
   }
 
-  handleStatTypeChange = e => {
+  handleStatTypeChange = (e) => {
     this.setState({
       timeLength: e.target.value
     });
@@ -38,7 +40,7 @@ class InvComponent extends React.Component {
       { from: 5, to: 100 }
     ][timeLength];
     this.props.dispatch({
-      type: "financial/refreshData",
+      type: 'financial/refreshData',
       payload
     });
   };
@@ -49,13 +51,13 @@ class InvComponent extends React.Component {
 
   render() {
     const marks = {
-      0: "1-2年",
-      1: "2-3年",
-      2: "3-4年",
-      3: "4-5年",
+      0: '1-2年',
+      1: '2-3年',
+      2: '3-4年',
+      3: '4-5年',
       4: {
         style: {
-          color: "#f50"
+          color: '#f50'
         },
         label: <strong>5年以上</strong>
       }
@@ -65,12 +67,10 @@ class InvComponent extends React.Component {
       <>
         <div
           className={styles.formItem}
-          style={{ display: "flex", alignItems: "center", paddingTop: 0 }}
-        >
+          style={{ display: 'flex', alignItems: 'center', paddingTop: 0 }}>
           <label
-            className={[styles.formLabel, styles.required].join(" ")}
-            style={{ paddingTop: -14 }}
-          >
+            className={[styles.formLabel, styles.required].join(' ')}
+            style={{ paddingTop: -14 }}>
             呆滞距今时间:
           </label>
           <Slider
@@ -79,13 +79,14 @@ class InvComponent extends React.Component {
             defaultValue={this.state.timeLength}
             min={0}
             max={4}
-            tipFormatter={idx => this.state.timeDesc[idx]}
-            onAfterChange={timeLength => this.setState({ timeLength })}
+            tipFormatter={(idx) => this.state.timeDesc[idx]}
+            onAfterChange={(timeLength) => this.setState({ timeLength })}
           />
         </div>
         <div className={styles.formItem}>
           <Button type="primary" onClick={this.queryData}>
-            <Icon type="search" />查询
+            <Icon type="search" />
+            查询
           </Button>
         </div>
       </>
@@ -115,9 +116,8 @@ class InvComponent extends React.Component {
             <td
               key={keyTd}
               style={{
-                textAlign: [3, 4, 6, 7].includes(keyTd) ? "right" : "left"
-              }}
-            >
+                textAlign: [3, 4, 6, 7].includes(keyTd) ? 'right' : 'left'
+              }}>
               {!R.isNil(td) && [3, 4, 6, 7].includes(keyTd)
                 ? lib.thouandsNum(td)
                 : td}
@@ -129,6 +129,66 @@ class InvComponent extends React.Component {
       return <tbody className="ant-table-tbody">{TbodyComponent}</tbody>;
     };
 
+    const Report = () => (
+      <div>
+        <TableTitle />
+        <table>
+          <thead>
+            <tr>
+              <th rowSpan="2">
+                <span>物料编码</span>
+              </th>
+              <th rowSpan="2">
+                <span>物料名称</span>
+              </th>
+              <th colSpan="4">
+                <span>末次收发情况</span>
+              </th>
+              <th colSpan="3">
+                <span>当前结存</span>
+              </th>
+              <th rowSpan="2">
+                <span>呆滞时长</span>
+              </th>
+            </tr>
+            <tr>
+              <th>
+                <span>事务处理类型</span>
+              </th>
+              <th>
+                <span>数量</span>
+              </th>
+              <th>
+                <span>金额</span>
+              </th>
+              <th>
+                <span>来源/帐户</span>
+              </th>
+              <th>
+                <span>数量</span>
+              </th>
+              <th>
+                <span>金额</span>
+              </th>
+              <th>
+                <span>子库</span>
+              </th>
+            </tr>
+          </thead>
+          <TableBody />
+        </table>
+        <div className={styles.action}>
+          <Button
+            type="primary"
+            onClick={() => {
+              window.print();
+            }}>
+            打印报表 <Icon type="printer" />
+          </Button>
+        </div>
+      </div>
+    );
+
     return (
       <>
         <div className={styles.card}>
@@ -137,69 +197,29 @@ class InvComponent extends React.Component {
             <QueryHeader />
           </div>
         </div>
-        {this.state.loaded &&
-          this.props.loading && <LoadingComponent queryList="1" />}
-        {this.state.loaded &&
-          !this.props.loading && (
-            <div className={styles.pdfContainer}>
-              <TableTitle />
-              <table>
-                <thead>
-                  <tr>
-                    <th rowSpan="2">
-                      <span>物料编码</span>
-                    </th>
-                    <th rowSpan="2">
-                      <span>物料名称</span>
-                    </th>
-                    <th colSpan="4">
-                      <span>末次收发情况</span>
-                    </th>
-                    <th colSpan="3">
-                      <span>当前结存</span>
-                    </th>
-                    <th rowSpan="2">
-                      <span>呆滞时长</span>
-                    </th>
-                  </tr>
-                  <tr>
-                    <th>
-                      <span>事务处理类型</span>
-                    </th>
-                    <th>
-                      <span>数量</span>
-                    </th>
-                    <th>
-                      <span>金额</span>
-                    </th>
-                    <th>
-                      <span>来源/帐户</span>
-                    </th>
-                    <th>
-                      <span>数量</span>
-                    </th>
-                    <th>
-                      <span>金额</span>
-                    </th>
-                    <th>
-                      <span>子库</span>
-                    </th>
-                  </tr>
-                </thead>
-                <TableBody />
-              </table>
-              <div className={styles.action}>
-                <Button
-                  type="primary"
-                  onClick={() => {
-                    window.print();
-                  }}
-                >
-                  打印报表 <Icon type="printer" />
-                </Button>
-              </div>
-            </div>
-          )}
+        {this.state.loaded && this.props.loading && (
+          <LoadingComponent queryList="1" />
+        )}
+        <Card className={styles.detail}>
+          <Tabs defaultActiveKey="1">
+            <TabPane tab="数据详情" key="1" style={{ minHeight: 500 }}>
+              {this.state.loaded && !this.props.loading && (
+                <div className={styles.pdfContainer}>
+                  <Report />
+                </div>
+              )}
+            </TabPane>
+            <TabPane tab="数据导出" key="2" style={{ minHeight: 500 }}>
+              {this.state.loaded && (
+                <VTable
+                  dataSrc={this.props.dataSource}
+                  loading={this.props.loading}
+                  {...this.state}
+                />
+              )}
+            </TabPane>
+          </Tabs>
+        </Card>
       </>
     );
   }
