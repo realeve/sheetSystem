@@ -194,6 +194,7 @@ function InvTable({
       [2, 3, 4, 5, 7, 8, 10, 11].includes(keyTd) ? lib.thouandsNum(td) : td;
 
     let TrComponent = ({ trData }, i) => {
+      // 对数据的处理可考虑添加到独立的js文件中，写测试文件
       let newRow = trData[0].slice(0, 4);
       trData[0].forEach((td, key) => {
         if (key < 4) {
@@ -201,7 +202,7 @@ function InvTable({
         }
         if ([4, 5, 7, 8, 10, 11].includes(key)) {
           let sum = 0;
-          trData.forEach(item => {
+          trData.forEach((item) => {
             // 汇总第key条数据
             sum += Number(item[key]);
           });
@@ -210,7 +211,7 @@ function InvTable({
           newRow[key] = '';
         }
       });
-      let newTrData = trData.map(item => item.slice(4, 13));
+      let newTrData = trData.map((item) => item.slice(4, 13));
 
       return (
         <React.Fragment>
@@ -241,45 +242,44 @@ function InvTable({
       );
     };
 
-    let TbodyComponent = distData.map(
-      (trData, key) =>
-        trData.length === 1 ? (
-          <tr className="ant-table-row" key={key}>
-            {trData[0].map((td, keyTd) => (
-              <td
-                key={keyTd}
-                style={{
-                  textAlign: [2, 3, 4, 5, 7, 8, 10, 11].includes(keyTd)
-                    ? 'right'
-                    : 'left'
-                }}>
-                {handleTdData(td, keyTd)}
-              </td>
-            ))}
-          </tr>
-        ) : (
-          <TrComponent trData={trData} key={key} />
-        )
+    let TbodyComponent = distData.map((trData, key) =>
+      trData.length === 1 ? (
+        <tr className="ant-table-row" key={key}>
+          {trData[0].map((td, keyTd) => (
+            <td
+              key={keyTd}
+              style={{
+                textAlign: [2, 3, 4, 5, 7, 8, 10, 11].includes(keyTd)
+                  ? 'right'
+                  : 'left'
+              }}>
+              {handleTdData(td, keyTd)}
+            </td>
+          ))}
+        </tr>
+      ) : (
+        <TrComponent trData={trData} key={key} />
+      )
     );
 
     // 数据列汇总
     let DatacountComponent = () => {
-      let sumData = idx => {
+      let sumData = (idx) => {
         let sum = 0;
-        data.forEach(trData => {
+        data.forEach((trData) => {
           sum += Number(trData[idx]);
         });
         return lib.thouandsNum(sum);
       };
 
       // 起初情况数据汇总
-      let sumBaseData = idx => {
+      let sumBaseData = (idx) => {
         let sum = 0;
         let baseData = R.compose(
           R.uniq,
           R.map(R.pick(['0', '1', '2', '3']))
         )(data);
-        baseData.forEach(trData => {
+        baseData.forEach((trData) => {
           sum += Number(trData[idx]);
         });
         return lib.thouandsNum(sum);
