@@ -75,7 +75,7 @@ export default {
             });
             dataDetail = R.clone(dataSource);
             dataDetail = Object.assign(dataDetail, {
-              header: ['序号', '物料编码', '物料名称', '数量', '金额']
+              header: ['物料编码', '物料名称', '数量', '金额']
             });
           } else {
             // 传入sn及name参数，减少数据行级。
@@ -103,7 +103,6 @@ export default {
 
           dataDetail = Object.assign(dataDetail, {
             header: [
-              '序号',
               '物料编码',
               '物料名称',
               '数量',
