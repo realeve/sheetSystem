@@ -212,7 +212,7 @@ class InvComponent extends React.Component {
             <TabPane tab="数据导出" key="2" style={{ minHeight: 500 }}>
               {this.state.loaded && (
                 <VTable
-                  dataSrc={this.props.dataSource}
+                  dataSrc={this.props.dataDetail}
                   loading={this.props.loading}
                   {...this.state}
                 />

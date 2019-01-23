@@ -1,6 +1,7 @@
 import * as db from '../services/db';
 import dateRanges from '../../../utils/ranges';
 import moment from 'moment';
+const R = require('ramda');
 
 const namespace = 'financial';
 export default {
@@ -9,7 +10,8 @@ export default {
     dateRange: [],
     dataSource: [],
     orgList: [],
-    router: ''
+    router: '',
+    dataDetail: []
   },
   reducers: {
     setStore(state, { payload }) {
@@ -20,7 +22,7 @@ export default {
     }
   },
   effects: {
-    *getOrgList(payload, { call, put }) {
+    *getOrgList(_, { call, put }) {
       let orgList = yield call(db.getOrgList);
       yield put({
         type: 'setStore',
@@ -33,6 +35,7 @@ export default {
       const { router } = yield select((state) => state[namespace]);
       // 根据路由调整数据
       let dataSource = [];
+      let dataDetail;
       switch (router) {
         case '/inv':
           let {
@@ -46,7 +49,6 @@ export default {
           } = payload;
 
           let period;
-
           // 期初至今
           if (statType === '0') {
             period = moment(periodName, 'YYYY-MM')
@@ -68,8 +70,12 @@ export default {
           if (queryMode === 1) {
             dataSource = yield call(db.getPayout, {
               periodb: curId,
-              perioda:baseid,
+              perioda: baseid,
               disaccount: `%${aliasName}%`
+            });
+            dataDetail = R.clone(dataSource);
+            dataDetail = Object.assign(dataDetail, {
+              header: ['序号', '物料编码', '物料名称', '数量', '金额']
             });
           } else {
             // 传入sn及name参数，减少数据行级。
@@ -87,13 +93,25 @@ export default {
                   ? `%${materialSN}%`
                   : '%%'
             });
+            dataDetail = R.clone(dataSource);
 
             if (dataSource.data.length) {
-              // console.log(dataSource);
               // 合并行级
               dataSource.data = db.handleInvData(dataSource.data);
             }
           }
+
+          dataDetail = Object.assign(dataDetail, {
+            header: [
+              '序号',
+              '物料编码',
+              '物料名称',
+              '数量',
+              '金额',
+              '帐户别名/来源/子库名称',
+              '类型'
+            ]
+          });
           break;
         case '/excess':
           // 当前时间
@@ -102,6 +120,25 @@ export default {
             moment().format('MM-YY')
           );
           dataSource = yield call(db.getExcess, payload);
+          dataDetail = R.clone(dataSource);
+          dataDetail.data = dataDetail.data.map((item) => {
+            item[4] = parseFloat(item[4]).toFixed(3);
+            return item;
+          });
+          dataDetail = Object.assign(dataDetail, {
+            header: [
+              '物料编码',
+              '物料名称',
+              '事务处理类型(末次发出)',
+              '数量(末次发出)',
+              '金额(末次发出)',
+              '来源/帐户(末次发出)',
+              '数量(结存)',
+              '金额(结存)',
+              '子库(结存)',
+              '呆滞时长'
+            ]
+          });
           break;
         default:
           break;
@@ -110,7 +147,8 @@ export default {
       yield put({
         type: 'setStore',
         payload: {
-          dataSource
+          dataSource,
+          dataDetail: db.handleDetailData(dataDetail)
         }
       });
     }

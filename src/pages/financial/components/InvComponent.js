@@ -230,8 +230,7 @@ class InvComponent extends React.Component {
       );
     };
 
-    let { dataSource, loading } = this.props;
-
+    let { dataSource, loading, dataDetail } = this.props;
     return (
       <React.Fragment>
         <div className={styles.card}>
@@ -264,7 +263,7 @@ class InvComponent extends React.Component {
             </TabPane>
             <TabPane tab="数据导出" key="2" style={{ minHeight: 500 }}>
               {this.state.loaded && (
-                <VTable dataSrc={dataSource} {...this.state} />
+                <VTable dataSrc={dataDetail} {...this.state} />
               )}
             </TabPane>
           </Tabs>

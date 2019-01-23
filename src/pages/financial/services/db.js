@@ -1,4 +1,5 @@
 import { axios, DEV } from '../../../utils/axios';
+import { handleSrcData } from '../../table/services/table';
 
 import moment from 'moment';
 const R = require('ramda');
@@ -15,7 +16,7 @@ const API = {
   IF_REC: DEV ? LOCAL + '9b089d2e3c_rec.json' : SERV + '153/16a5f99c46.html',
   EXCESS_INV: DEV
     ? LOCAL + '117dd652a7_inv_alanysis.json'
-    : SERV + '155/117dd652a7/array.html',
+    : SERV + '155/117dd652a7/array.html?cache=60',
   IF_REMAIN: DEV
     ? LOCAL + '713e3e1011_invSub.json'
     : SERV + '154/713e3e1011.html',
@@ -234,4 +235,34 @@ export const handleInvData = (invData) => {
     dist = [...dist, ...item];
   });
   return dist;
+};
+
+export const handleDetailData = (dataDetail) => {
+  // 转换dataSource为表格所需格式
+  dataDetail.data = dataDetail.data
+    .map((item) => Object.values(item))
+    .map((item) => {
+      if (dataDetail.rows <= 5) {
+        return item;
+      }
+      let text = '';
+      switch (parseInt(R.last(item), 10)) {
+        case 0:
+          text = '期初';
+          break;
+        case 1:
+          text = '收入';
+          break;
+        case 2:
+          text = '发出';
+          break;
+        case 3:
+          text = '结存';
+          break;
+        default:
+          break;
+      }
+      return [...R.init(item), text];
+    });
+  return handleSrcData(dataDetail);
 };
